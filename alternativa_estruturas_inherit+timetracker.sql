@@ -234,11 +234,11 @@ WHERE	"classe" = 'sinaletica' AND "time_end" IS NULL;
 CREATE OR REPLACE RULE "_DELETE" AS ON DELETE TO "PGHP".infra_sinaletica DO INSTEAD
   DELETE FROM "PGHP"."infraestruturas_pontos" WHERE gid = OLD."gid";
 CREATE OR REPLACE RULE "_INSERT" AS ON INSERT TO "PGHP".infra_sinaletica DO INSTEAD
-  INSERT INTO "PGHP"."infraestruturas_pontos" ("oid","uniterr_oid","classe","tipo","nome","cadeado","estado","accao","observacoes","geom")
-    VALUES (NEW."oid",NEW."uniterr_oid",'sinaletica',NEW."tipo",NEW."nome",NEW."cadeado",NEW."estado",NEW."accao",NEW."observacoes",NEW."geom");
+  INSERT INTO "PGHP"."infraestruturas_pontos" ("oid","uniterr_oid","classe","tipo","nome","estado","accao","observacoes","geom")
+    VALUES (NEW."oid",NEW."uniterr_oid",'sinaletica',NEW."tipo",NEW."nome",NEW."estado",NEW."accao",NEW."observacoes",NEW."geom");
 CREATE OR REPLACE RULE "_UPDATE" AS ON UPDATE TO "PGHP".infra_sinaletica DO INSTEAD
   UPDATE "PGHP"."infraestruturas_pontos"
-    SET "oid" = COALESCE(NEW."oid",-1),"uniterr_oid" = NEW."uniterr_oid","classe" = 'sinaletica',"tipo" = NEW."tipo","nome" = NEW."nome","cadeado" = NEW."cadeado","estado" = NEW."estado","accao" = NEW."accao","observacoes" = NEW."observacoes","geom" = NEW."geom" 
+    SET "oid" = COALESCE(NEW."oid",-1),"uniterr_oid" = NEW."uniterr_oid","classe" = 'sinaletica',"tipo" = NEW."tipo","nome" = NEW."nome","estado" = NEW."estado","accao" = NEW."accao","observacoes" = NEW."observacoes","geom" = NEW."geom" 
     WHERE gid = OLD."gid";
 
 -- Vedacoes
@@ -251,11 +251,11 @@ WHERE	"classe" = 'vedacoes' AND "time_end" IS NULL;
 CREATE OR REPLACE RULE "_DELETE" AS ON DELETE TO "PGHP".infra_vedacoes DO INSTEAD
   DELETE FROM "PGHP"."infraestruturas_linhas" WHERE gid = OLD."gid";
 CREATE OR REPLACE RULE "_INSERT" AS ON INSERT TO "PGHP".infra_vedacoes DO INSTEAD
-  INSERT INTO "PGHP"."infraestruturas_linhas" ("oid","uniterr_oid","classe","tipo","nome","cadeado","estado","accao","observacoes","geom")
-    VALUES (NEW."oid",NEW."uniterr_oid",'vedacoes',NEW."tipo",NEW."nome",NEW."cadeado",NEW."estado",NEW."accao",NEW."observacoes",NEW."geom");
+  INSERT INTO "PGHP"."infraestruturas_linhas" ("oid","uniterr_oid","classe","tipo","nome","estado","accao","observacoes","geom")
+    VALUES (NEW."oid",NEW."uniterr_oid",'vedacoes',NEW."tipo",NEW."nome",NEW."estado",NEW."accao",NEW."observacoes",NEW."geom");
 CREATE OR REPLACE RULE "_UPDATE" AS ON UPDATE TO "PGHP".infra_vedacoes DO INSTEAD
   UPDATE "PGHP"."infraestruturas_linhas"
-    SET "oid" = COALESCE(NEW."oid",-1),"uniterr_oid" = NEW."uniterr_oid","classe" = 'vedacoes',"tipo" = NEW."tipo","nome" = NEW."nome","cadeado" = NEW."cadeado","estado" = NEW."estado","accao" = NEW."accao","observacoes" = NEW."observacoes","geom" = NEW."geom" 
+    SET "oid" = COALESCE(NEW."oid",-1),"uniterr_oid" = NEW."uniterr_oid","classe" = 'vedacoes',"tipo" = NEW."tipo","nome" = NEW."nome","estado" = NEW."estado","accao" = NEW."accao","observacoes" = NEW."observacoes","geom" = NEW."geom" 
     WHERE gid = OLD."gid";
 
 -- Passagens_hidraulicas
@@ -268,11 +268,11 @@ WHERE	"classe" = 'passagens_hidraulicas' AND "time_end" IS NULL;
 CREATE OR REPLACE RULE "_DELETE" AS ON DELETE TO "PGHP".infra_passagens_hidraulicas DO INSTEAD
   DELETE FROM "PGHP"."infraestruturas_linhas" WHERE gid = OLD."gid";
 CREATE OR REPLACE RULE "_INSERT" AS ON INSERT TO "PGHP".infra_passagens_hidraulicas DO INSTEAD
-  INSERT INTO "PGHP"."infraestruturas_linhas" ("oid","uniterr_oid","classe","tipo","nome","cadeado","estado","accao","observacoes","geom")
-    VALUES (NEW."oid",NEW."uniterr_oid",'passagens_hidraulicas',NEW."tipo",NEW."nome",NEW."cadeado",NEW."estado",NEW."accao",NEW."observacoes",NEW."geom");
+  INSERT INTO "PGHP"."infraestruturas_linhas" ("oid","uniterr_oid","classe","tipo","nome","estado","accao","observacoes","geom")
+    VALUES (NEW."oid",NEW."uniterr_oid",'passagens_hidraulicas',NEW."tipo",NEW."nome",NEW."estado",NEW."accao",NEW."observacoes",NEW."geom");
 CREATE OR REPLACE RULE "_UPDATE" AS ON UPDATE TO "PGHP".infra_passagens_hidraulicas DO INSTEAD
   UPDATE "PGHP"."infraestruturas_linhas"
-    SET "oid" = COALESCE(NEW."oid",-1),"uniterr_oid" = NEW."uniterr_oid","classe" = 'passagens_hidraulicas',"tipo" = NEW."tipo","nome" = NEW."nome","cadeado" = NEW."cadeado","estado" = NEW."estado","accao" = NEW."accao","observacoes" = NEW."observacoes","geom" = NEW."geom" 
+    SET "oid" = COALESCE(NEW."oid",-1),"uniterr_oid" = NEW."uniterr_oid","classe" = 'passagens_hidraulicas',"tipo" = NEW."tipo","nome" = NEW."nome","estado" = NEW."estado","accao" = NEW."accao","observacoes" = NEW."observacoes","geom" = NEW."geom" 
     WHERE gid = OLD."gid";
 
 -- edificios
@@ -285,9 +285,9 @@ WHERE	"classe" = 'edificios' AND "time_end" IS NULL;
 CREATE OR REPLACE RULE "_DELETE" AS ON DELETE TO "PGHP".infra_edificios DO INSTEAD
   DELETE FROM "PGHP"."infraestruturas_poligonos" WHERE gid = OLD."gid";
 CREATE OR REPLACE RULE "_INSERT" AS ON INSERT TO "PGHP".infra_edificios DO INSTEAD
-  INSERT INTO "PGHP"."infraestruturas_poligonos" ("oid","uniterr_oid","classe","tipo","nome","cadeado","estado","accao","observacoes","geom")
-    VALUES (NEW."oid",NEW."uniterr_oid",'edificios',NEW."tipo",NEW."nome",NEW."cadeado",NEW."estado",NEW."accao",NEW."observacoes",NEW."geom");
+  INSERT INTO "PGHP"."infraestruturas_poligonos" ("oid","uniterr_oid","classe","tipo","nome","estado","accao","observacoes","geom")
+    VALUES (NEW."oid",NEW."uniterr_oid",'edificios',NEW."tipo",NEW."nome",NEW."estado",NEW."accao",NEW."observacoes",NEW."geom");
 CREATE OR REPLACE RULE "_UPDATE" AS ON UPDATE TO "PGHP".infra_edificios DO INSTEAD
   UPDATE "PGHP"."infraestruturas_poligonos"
-    SET "oid" = COALESCE(NEW."oid",-1),"uniterr_oid" = NEW."uniterr_oid","classe" = 'edificios',"tipo" = NEW."tipo","nome" = NEW."nome","cadeado" = NEW."cadeado","estado" = NEW."estado","accao" = NEW."accao","observacoes" = NEW."observacoes","geom" = NEW."geom" 
+    SET "oid" = COALESCE(NEW."oid",-1),"uniterr_oid" = NEW."uniterr_oid","classe" = 'edificios',"tipo" = NEW."tipo","nome" = NEW."nome","estado" = NEW."estado","accao" = NEW."accao","observacoes" = NEW."observacoes","geom" = NEW."geom" 
     WHERE gid = OLD."gid";
