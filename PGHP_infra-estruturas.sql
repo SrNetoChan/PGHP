@@ -1,4 +1,29 @@
 ﻿/* INFRA-ESTRUTURAS */
+-- Criação de tabelas auxiliares
+CREATE TABLE "PGHP".infraestruturas_classe_tipo
+(
+oid serial primary key,
+classe character varying(40),
+tipo character varying(40)
+);
+-- ver possibilidade de criar views, rules e trigger automáticos para cada nova classe criada (ver postgis in action)
+
+-- Indice para garantir que não existem valores repetidos
+CREATE UNIQUE INDEX infraestruturas_tipo_idx ON "PGHP".infraestruturas_classe_tipo (classe, tipo);
+
+
+CREATE TABLE "PGHP".infraestruturas_estado
+(
+oid serial primary key,
+estado character varying(40) UNIQUE
+);
+
+
+CREATE TABLE "PGHP".infraestruturas_accoes
+(
+oid serial primary key,
+accao character varying(40) UNIQUE
+);
 
 -- Criar tabela das infraestrutura (parent)
 
@@ -14,8 +39,8 @@ CREATE TABLE "PGHP".infraestruturas
 	tipo character varying(40),
 	nome character varying(40),
 	cadeado boolean,
-	estado character varying(40) REFERENCES "PGHP".estado_infraestruturas(nome_estado),
-	accao character varying(40) REFERENCES "PGHP".accoes_infraestruturas(nome_accao),
+	estado character varying(40) REFERENCES "PGHP".infraestruturas_estado(estado),
+	accao character varying(40) REFERENCES "PGHP".infraestruturas_accoes(accao),
 	observacoes character varying,
 	geom geometry(geometry, 3763),
 	time_start timestamp, -- data de criação da linha
@@ -37,8 +62,8 @@ CREATE TABLE "PGHP".infraestruturas_pontos
 	--geom geometry(POINT, 3763),
 	CONSTRAINT infraestruturas_pontos_pk PRIMARY KEY (gid),
 	CONSTRAINT enforce_geotype_geom CHECK (geometrytype(geom) = 'POINT'::text),
-	CONSTRAINT infraestruturas_pontos_estado_fkey FOREIGN KEY (estado) REFERENCES "PGHP".estado_infraestruturas (nome_estado),
-	CONSTRAINT infraestruturas_pontos_accao_fkey FOREIGN KEY (accao) REFERENCES "PGHP".accoes_infraestruturas (nome_accao),
+	CONSTRAINT infraestruturas_pontos_estado_fkey FOREIGN KEY (estado) REFERENCES "PGHP".infraestruturas_estado (estado),
+	CONSTRAINT infraestruturas_pontos_accao_fkey FOREIGN KEY (accao) REFERENCES "PGHP".infraestruturas_accoes (accao),
 	CONSTRAINT infraestruturas_pontos_uniterr_oid_fkey FOREIGN KEY (uniterr_oid) REFERENCES"PGHP".unidadesterritoriais(oid)
 )
 	INHERITS ("PGHP".infraestruturas);
@@ -55,8 +80,8 @@ CREATE TABLE "PGHP".infraestruturas_linhas
 	--geom geometry(MULTILINESTRING, 3763),
 	CONSTRAINT infraestruturas_linhas_pk PRIMARY KEY (gid),
 	CONSTRAINT enforce_geotype_geom CHECK (geometrytype(geom) = 'MULTILINESTRING'::text),
-	CONSTRAINT infraestruturas_linhas_estado_fkey FOREIGN KEY (estado) REFERENCES "PGHP".estado_infraestruturas (nome_estado),
-	CONSTRAINT infraestruturas_linhas_accao_fkey FOREIGN KEY (accao) REFERENCES "PGHP".accoes_infraestruturas (nome_accao),
+	CONSTRAINT infraestruturas_linhas_estado_fkey FOREIGN KEY (estado) REFERENCES "PGHP".infraestruturas_estado (estado),
+	CONSTRAINT infraestruturas_linhas_accao_fkey FOREIGN KEY (accao) REFERENCES "PGHP".infraestruturas_accoes (accao),
 	CONSTRAINT infraestruturas_linhas_uniterr_oid_fkey FOREIGN KEY (uniterr_oid) REFERENCES"PGHP".unidadesterritoriais(oid)
 )
 	INHERITS ("PGHP".infraestruturas);
@@ -73,8 +98,8 @@ CREATE TABLE "PGHP".infraestruturas_poligonos
 	--geom geometry(MULTIPOLYGON, 3763),
 	CONSTRAINT infraestruturas_poligonos_pk PRIMARY KEY (gid),
 	CONSTRAINT enforce_geotype_geom CHECK (geometrytype(geom) = 'MULTIPOLYGON'::text),
-	CONSTRAINT infraestruturas_poligonos_estado_fkey FOREIGN KEY (estado) REFERENCES "PGHP".estado_infraestruturas (nome_estado),
-	CONSTRAINT infraestruturas_poligonos_accao_fkey FOREIGN KEY (accao) REFERENCES "PGHP".accoes_infraestruturas (nome_accao),
+	CONSTRAINT infraestruturas_poligonos_estado_fkey FOREIGN KEY (estado) REFERENCES "PGHP".infraestruturas_estado (estado),
+	CONSTRAINT infraestruturas_poligonos_accao_fkey FOREIGN KEY (accao) REFERENCES "PGHP".infraestruturas_accoes (accao),
 	CONSTRAINT infraestruturas_poligonos_uniterr_oid_fkey FOREIGN KEY (uniterr_oid) REFERENCES"PGHP".unidadesterritoriais(oid)
 )
 	INHERITS ("PGHP".infraestruturas);

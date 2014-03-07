@@ -1,14 +1,18 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
 <qgis projectname="" version="2.2.0-Valmiera">
     <title></title>
-    <relations/>
+    <relations>
+        <relation referencingLayer="unidadesdegestao20140210114731766" referencedLayer="unidadesterritoriais20140210114731498" id="unidadesdegestao20140210114731766_uniterr_oid_unidadesterritoriais20140210114731498_oid" name="uniterr-uniges">
+            <fieldRef referencedField="oid" referencingField="uniterr_oid"/>
+        </relation>
+    </relations>
     <mapcanvas>
         <units>meters</units>
         <extent>
-            <xmin>-112379.29785820208780933</xmin>
-            <ymin>-102358.76444929566059727</ymin>
-            <xmax>-112175.46504304833069909</xmax>
-            <ymax>-102239.15523638621380087</ymax>
+            <xmin>-112938.03796567190147471</xmin>
+            <ymin>-101662.99763561335566919</ymin>
+            <xmax>-110513.41392779284797143</xmax>
+            <ymax>-100641.64852200927271042</ymax>
         </extent>
         <projections>1</projections>
         <destinationsrs>
@@ -35,7 +39,7 @@
             <layer_coordinate_transform destAuthId="EPSG:3763" srcAuthId="EPSG:27493" srcDatumTransform="1983" destDatumTransform="1149" layerid="Veg_potencial20130923155515125"/>
         </layer_coordinate_transform_info>
     </mapcanvas>
-    <legend updateDrawingOrder="false" activeLayer="estado_infraestruturas20140213155357251">
+    <legend updateDrawingOrder="false">
         <legendgroup open="true" checked="Qt::Unchecked" name="Acções">
             <legendlayer drawingOrder="15" open="true" checked="Qt::Unchecked" name="acoes" showFeatureCount="0">
                 <filegroup open="true" hidden="false">
@@ -59,9 +63,9 @@
                     <legendlayerfile isInOverview="0" layerid="portoes20140213112852797" visible="0"/>
                 </filegroup>
             </legendlayer>
-            <legendlayer drawingOrder="10" open="true" checked="Qt::Unchecked" name="sinaletica" showFeatureCount="0">
+            <legendlayer drawingOrder="10" open="true" checked="Qt::Checked" name="sinaletica" showFeatureCount="0">
                 <filegroup open="true" hidden="false">
-                    <legendlayerfile isInOverview="0" layerid="sinaletica20140213113539350" visible="0"/>
+                    <legendlayerfile isInOverview="0" layerid="sinaletica20140213113539350" visible="1"/>
                 </filegroup>
             </legendlayer>
             <legendlayer drawingOrder="14" open="true" checked="Qt::Checked" name="vedacoes" showFeatureCount="0">
@@ -93,14 +97,14 @@
             </filegroup>
         </legendlayer>
         <legendgroup open="true" checked="Qt::PartiallyChecked" name="Unidades de gestão">
-            <legendlayer drawingOrder="18" open="true" checked="Qt::Checked" name="Ocupação actual" showFeatureCount="0">
+            <legendlayer drawingOrder="18" open="true" checked="Qt::Unchecked" name="Ocupação actual" showFeatureCount="0">
                 <filegroup open="true" hidden="false">
-                    <legendlayerfile isInOverview="0" layerid="Proposta_de_Uso_copy20140210115305932" visible="1"/>
+                    <legendlayerfile isInOverview="0" layerid="Proposta_de_Uso_copy20140210115305932" visible="0"/>
                 </filegroup>
             </legendlayer>
-            <legendlayer drawingOrder="19" open="true" checked="Qt::Unchecked" name="Proposta de Uso" showFeatureCount="0">
+            <legendlayer drawingOrder="19" open="true" checked="Qt::Checked" name="Proposta de Uso" showFeatureCount="0">
                 <filegroup open="true" hidden="false">
-                    <legendlayerfile isInOverview="0" layerid="unidadesdegestao20140210114731766" visible="0"/>
+                    <legendlayerfile isInOverview="0" layerid="unidadesdegestao20140210114731766" visible="1"/>
                 </filegroup>
             </legendlayer>
         </legendgroup>
@@ -205,7 +209,7 @@
                     <prop k="width_border" v="0.26"/>
                 </layer>
             </symbol>
-            <ComposerScaleBar penColor="#333333" style="Line Ticks Up" numMapUnitsPerScaleBarUnit="1" alignment="0" brushColor="#000000" numSegments="3" segmentMillimeters="41.6493" fontColor="#333333" font="Verdana,10,-1,5,75,0,0,0,0,0" numUnitsPerSegment="250" units="1" labelBarSpace="3" outlineWidth="0.5" numSegmentsLeft="0" height="3" mapId="0" boxContentSpace="3" unitLabel="m">
+            <ComposerScaleBar penColor="#333333" style="Line Ticks Up" numMapUnitsPerScaleBarUnit="1" alignment="0" brushColor="#000000" numSegments="3" segmentMillimeters="41.6557" fontColor="#333333" font="Verdana,10,-1,5,75,0,0,0,0,0" numUnitsPerSegment="250" units="1" labelBarSpace="3" outlineWidth="0.5" numSegmentsLeft="0" height="3" mapId="0" boxContentSpace="3" unitLabel="m">
                 <ComposerItem width="141.925" x="18.0045" transparency="0" y="562.361" height="15.5" positionMode="0" frame="false" outlineWidth="0.3" zValue="4" itemRotation="0" lastValidViewScaleFactor="3.7042" uuid="{144d6b35-d6ce-4a30-8f9b-97177fe02231}" id="" background="true" blendMode="0" positionLock="false">
                     <FrameColor alpha="255" red="0" blue="0" green="0"/>
                     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
@@ -932,7 +936,7 @@
                     <prop k="width_border" v="0.26"/>
                 </layer>
             </symbol>
-            <ComposerScaleBar penColor="#333333" style="Line Ticks Up" numMapUnitsPerScaleBarUnit="1" alignment="0" brushColor="#000000" numSegments="3" segmentMillimeters="41.6493" fontColor="#333333" font="Verdana,10,-1,5,75,0,0,0,0,0" numUnitsPerSegment="250" units="1" labelBarSpace="3" outlineWidth="0.5" numSegmentsLeft="0" height="3" mapId="0" boxContentSpace="3" unitLabel="m">
+            <ComposerScaleBar penColor="#333333" style="Line Ticks Up" numMapUnitsPerScaleBarUnit="1" alignment="0" brushColor="#000000" numSegments="3" segmentMillimeters="41.6557" fontColor="#333333" font="Verdana,10,-1,5,75,0,0,0,0,0" numUnitsPerSegment="250" units="1" labelBarSpace="3" outlineWidth="0.5" numSegmentsLeft="0" height="3" mapId="0" boxContentSpace="3" unitLabel="m">
                 <ComposerItem width="141.883" x="18.0045" transparency="0" y="562.361" height="15.5" positionMode="0" frame="false" outlineWidth="0.3" zValue="4" itemRotation="0" lastValidViewScaleFactor="3.7042" uuid="{31cfca13-e69c-4041-ba9b-618a1dd93c52}" id="" background="true" blendMode="0" positionLock="false">
                     <FrameColor alpha="255" red="0" blue="0" green="0"/>
                     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
@@ -4699,7 +4703,9 @@
                 <edittype labelontop="0" editable="1" allowNull="false" orderByValue="true" key="nome" layer="usos20140213144836437" allowMulti="false" filterExpression="" type="15" value="nome" name="prop_uso"/>
                 <edittype labelontop="0" editable="1" type="0" name="uniges_cod"/>
                 <edittype labelontop="0" editable="1" type="0" name="uniges_oid"/>
-                <edittype labelontop="0" editable="1" allowNull="false" orderByValue="true" key="oid" layer="unidadesterritoriais20140210114731498" allowMulti="false" filterExpression="" type="15" value="nome" name="uniterr_oid"/>
+                <edittype labelontop="0" editable="1" widgetv2type="RelationReference" type="20" name="uniterr_oid">
+                    <widgetv2config ShowForm="0" Relation="unidadesdegestao20140210114731766_uniterr_oid_unidadesterritoriais20140210114731498_oid" AllowNULL="0"/>
+                </edittype>
             </edittypes>
             <editform>../../Quinta do Pisao_Parque Natureza/05 Plano de Gestão da Biodiversidade/Dados</editform>
             <editforminit></editforminit>
@@ -4733,7 +4739,7 @@
             </srs>
             <customproperties/>
             <provider encoding="ISO-8859-1">postgres</provider>
-            <previewExpression>COALESCE("oid", '&lt;NULL>')</previewExpression>
+            <previewExpression>COALESCE("oid"||' - '||"nome", '&lt;NULL>')</previewExpression>
             <vectorjoins/>
             <editform>.</editform>
             <editforminit></editforminit>
@@ -5404,7 +5410,7 @@
             <active type="int">0</active>
             <timeFrameType type="QString">days</timeFrameType>
             <loopAnimation type="int">0</loopAnimation>
-            <currentMapTimePosition type="int">1392639985</currentMapTimePosition>
+            <currentMapTimePosition type="int">1394119133</currentMapTimePosition>
             <animationFrameLength type="int">2000</animationFrameLength>
             <timeLayerList type="QStringList"/>
             <playBackwards type="int">0</playBackwards>
@@ -5420,12 +5426,13 @@
             <Automatic type="bool">true</Automatic>
             <DegreeFormat type="QString">D</DegreeFormat>
         </PositionPrecision>
+        <WCSUrl type="QString"></WCSUrl>
         <WMSContactPhone type="QString"></WMSContactPhone>
         <WMSServiceCapabilities type="bool">false</WMSServiceCapabilities>
         <WMSServiceAbstract type="QString"></WMSServiceAbstract>
         <WMSAddWktGeometry type="bool">false</WMSAddWktGeometry>
         <Measure>
-            <Ellipsoid type="QString">NONE</Ellipsoid>
+            <Ellipsoid type="QString">GRS80</Ellipsoid>
         </Measure>
         <WFSTLayers>
             <Insert type="QStringList"/>
@@ -5552,9 +5559,10 @@
             <pythonCode type="QString"></pythonCode>
         </Macros>
         <WMSAccessConstraints type="QString"></WMSAccessConstraints>
+        <WCSLayers type="QStringList"/>
         <SpatialRefSys>
             <ProjectCRSProj4String type="QString">+proj=tmerc +lat_0=39.66825833333333 +lon_0=-8.133108333333334 +k=1 +x_0=0 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</ProjectCRSProj4String>
-            <ProjectCrs type="QString">EPSG:4326</ProjectCrs>
+            <ProjectCrs type="QString">EPSG:3763</ProjectCrs>
             <ProjectCRSID type="int">1721</ProjectCRSID>
             <ProjectionsEnabled type="int">1</ProjectionsEnabled>
         </SpatialRefSys>
