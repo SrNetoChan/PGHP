@@ -11,6 +11,7 @@ tipo character varying(40)
 -- Indice para garantir que não existem valores repetidos
 CREATE UNIQUE INDEX infraestruturas_tipo_idx ON "PGHP".infraestruturas_classe_tipo (classe, tipo);
 
+CREATE OR REPLACE VIEW
 
 CREATE TABLE "PGHP".infraestruturas_estado
 (
@@ -236,83 +237,97 @@ FOR EACH ROW EXECUTE PROCEDURE "PGHP"."infraestruturas_insert"();
 CREATE OR REPLACE VIEW "PGHP".infra_portoes AS
 SELECT	"gid", "oid", "uniterr_oid", "tipo", "nome", "cadeado", "estado", "accao", "observacoes", "geom"::Geometry(POINT, 3763),"time_start","time_end","user_update"
 FROM	"PGHP"."infraestruturas_pontos"
-WHERE	"classe" = 'portoes' AND "time_end" IS NULL;
+WHERE	"classe" = 'Portões' AND "time_end" IS NULL;
 
 --CRIAR TRIGGERS E RULES para tornar a VIEW "Editável"
 CREATE OR REPLACE RULE "_DELETE" AS ON DELETE TO "PGHP".infra_portoes DO INSTEAD
   DELETE FROM "PGHP"."infraestruturas_pontos" WHERE gid = OLD."gid";
 CREATE OR REPLACE RULE "_INSERT" AS ON INSERT TO "PGHP".infra_portoes DO INSTEAD
   INSERT INTO "PGHP"."infraestruturas_pontos" ("oid","uniterr_oid","classe","tipo","nome","cadeado","estado","accao","observacoes","geom")
-    VALUES (NEW."oid",NEW."uniterr_oid",'portoes',NEW."tipo",NEW."nome",NEW."cadeado",NEW."estado",NEW."accao",NEW."observacoes",NEW."geom");
+    VALUES (NEW."oid",NEW."uniterr_oid",'Portões',NEW."tipo",NEW."nome",NEW."cadeado",NEW."estado",NEW."accao",NEW."observacoes",NEW."geom");
 CREATE OR REPLACE RULE "_UPDATE" AS ON UPDATE TO "PGHP".infra_portoes DO INSTEAD
   UPDATE "PGHP"."infraestruturas_pontos"
-    SET "oid" = COALESCE(NEW."oid",-1),"uniterr_oid" = NEW."uniterr_oid","classe" = 'portoes',"tipo" = NEW."tipo","nome" = NEW."nome","cadeado" = NEW."cadeado","estado" = NEW."estado","accao" = NEW."accao","observacoes" = NEW."observacoes","geom" = NEW."geom" 
+    SET "oid" = COALESCE(NEW."oid",-1),"uniterr_oid" = NEW."uniterr_oid","classe" = 'Portões',"tipo" = NEW."tipo","nome" = NEW."nome","cadeado" = NEW."cadeado","estado" = NEW."estado","accao" = NEW."accao","observacoes" = NEW."observacoes","geom" = NEW."geom" 
     WHERE gid = OLD."gid";
 
 -- Sinaletica
 CREATE OR REPLACE VIEW "PGHP".infra_sinaletica AS
 SELECT	"gid", "oid", "uniterr_oid", "tipo", "nome", "estado", "accao", "observacoes", "geom"::Geometry(POINT, 3763),"time_start","time_end","user_update"
 FROM	"PGHP"."infraestruturas_pontos"
-WHERE	"classe" = 'sinaletica' AND "time_end" IS NULL;
+WHERE	"classe" = 'Sinalética' AND "time_end" IS NULL;
 
 --CRIAR TRIGGERS E RULES para tornar a VIEW "Editável"
 CREATE OR REPLACE RULE "_DELETE" AS ON DELETE TO "PGHP".infra_sinaletica DO INSTEAD
   DELETE FROM "PGHP"."infraestruturas_pontos" WHERE gid = OLD."gid";
 CREATE OR REPLACE RULE "_INSERT" AS ON INSERT TO "PGHP".infra_sinaletica DO INSTEAD
   INSERT INTO "PGHP"."infraestruturas_pontos" ("oid","uniterr_oid","classe","tipo","nome","estado","accao","observacoes","geom")
-    VALUES (NEW."oid",NEW."uniterr_oid",'sinaletica',NEW."tipo",NEW."nome",NEW."estado",NEW."accao",NEW."observacoes",NEW."geom");
+    VALUES (NEW."oid",NEW."uniterr_oid",'Sinalética',NEW."tipo",NEW."nome",NEW."estado",NEW."accao",NEW."observacoes",NEW."geom");
 CREATE OR REPLACE RULE "_UPDATE" AS ON UPDATE TO "PGHP".infra_sinaletica DO INSTEAD
   UPDATE "PGHP"."infraestruturas_pontos"
-    SET "oid" = COALESCE(NEW."oid",-1),"uniterr_oid" = NEW."uniterr_oid","classe" = 'sinaletica',"tipo" = NEW."tipo","nome" = NEW."nome","estado" = NEW."estado","accao" = NEW."accao","observacoes" = NEW."observacoes","geom" = NEW."geom" 
+    SET "oid" = COALESCE(NEW."oid",-1),"uniterr_oid" = NEW."uniterr_oid","classe" = 'Sinalética',"tipo" = NEW."tipo","nome" = NEW."nome","estado" = NEW."estado","accao" = NEW."accao","observacoes" = NEW."observacoes","geom" = NEW."geom" 
     WHERE gid = OLD."gid";
 
 -- Vedacoes
 CREATE OR REPLACE VIEW "PGHP".infra_vedacoes AS
 SELECT	"gid", "oid", "uniterr_oid", "tipo", "nome", "estado", "accao", "observacoes", "geom"::Geometry(MULTILINESTRING, 3763),"time_start","time_end","user_update"
 FROM	"PGHP"."infraestruturas_linhas"
-WHERE	"classe" = 'vedacoes' AND "time_end" IS NULL;
+WHERE	"classe" = 'Vedações' AND "time_end" IS NULL;
 
 --CRIAR TRIGGERS E RULES para tornar a VIEW "Editável"
 CREATE OR REPLACE RULE "_DELETE" AS ON DELETE TO "PGHP".infra_vedacoes DO INSTEAD
   DELETE FROM "PGHP"."infraestruturas_linhas" WHERE gid = OLD."gid";
 CREATE OR REPLACE RULE "_INSERT" AS ON INSERT TO "PGHP".infra_vedacoes DO INSTEAD
   INSERT INTO "PGHP"."infraestruturas_linhas" ("oid","uniterr_oid","classe","tipo","nome","estado","accao","observacoes","geom")
-    VALUES (NEW."oid",NEW."uniterr_oid",'vedacoes',NEW."tipo",NEW."nome",NEW."estado",NEW."accao",NEW."observacoes",NEW."geom");
+    VALUES (NEW."oid",NEW."uniterr_oid",'Vedações',NEW."tipo",NEW."nome",NEW."estado",NEW."accao",NEW."observacoes",NEW."geom");
 CREATE OR REPLACE RULE "_UPDATE" AS ON UPDATE TO "PGHP".infra_vedacoes DO INSTEAD
   UPDATE "PGHP"."infraestruturas_linhas"
-    SET "oid" = COALESCE(NEW."oid",-1),"uniterr_oid" = NEW."uniterr_oid","classe" = 'vedacoes',"tipo" = NEW."tipo","nome" = NEW."nome","estado" = NEW."estado","accao" = NEW."accao","observacoes" = NEW."observacoes","geom" = NEW."geom" 
+    SET "oid" = COALESCE(NEW."oid",-1),"uniterr_oid" = NEW."uniterr_oid","classe" = 'Vedações',"tipo" = NEW."tipo","nome" = NEW."nome","estado" = NEW."estado","accao" = NEW."accao","observacoes" = NEW."observacoes","geom" = NEW."geom" 
     WHERE gid = OLD."gid";
 
 -- Passagens_hidraulicas
 CREATE OR REPLACE VIEW "PGHP".infra_passagens_hidraulicas AS
 SELECT	"gid", "oid", "uniterr_oid", "tipo", "nome", "estado", "accao", "observacoes", "geom"::Geometry(MULTILINESTRING, 3763),"time_start","time_end","user_update"
 FROM	"PGHP"."infraestruturas_linhas"
-WHERE	"classe" = 'passagens_hidraulicas' AND "time_end" IS NULL;
+WHERE	"classe" = 'Passagens hidráulicas' AND "time_end" IS NULL;
 
 --CRIAR TRIGGERS E RULES para tornar a VIEW "Editável"
 CREATE OR REPLACE RULE "_DELETE" AS ON DELETE TO "PGHP".infra_passagens_hidraulicas DO INSTEAD
   DELETE FROM "PGHP"."infraestruturas_linhas" WHERE gid = OLD."gid";
 CREATE OR REPLACE RULE "_INSERT" AS ON INSERT TO "PGHP".infra_passagens_hidraulicas DO INSTEAD
   INSERT INTO "PGHP"."infraestruturas_linhas" ("oid","uniterr_oid","classe","tipo","nome","estado","accao","observacoes","geom")
-    VALUES (NEW."oid",NEW."uniterr_oid",'passagens_hidraulicas',NEW."tipo",NEW."nome",NEW."estado",NEW."accao",NEW."observacoes",NEW."geom");
+    VALUES (NEW."oid",NEW."uniterr_oid",'Passagens hidráulicas',NEW."tipo",NEW."nome",NEW."estado",NEW."accao",NEW."observacoes",NEW."geom");
 CREATE OR REPLACE RULE "_UPDATE" AS ON UPDATE TO "PGHP".infra_passagens_hidraulicas DO INSTEAD
   UPDATE "PGHP"."infraestruturas_linhas"
-    SET "oid" = COALESCE(NEW."oid",-1),"uniterr_oid" = NEW."uniterr_oid","classe" = 'passagens_hidraulicas',"tipo" = NEW."tipo","nome" = NEW."nome","estado" = NEW."estado","accao" = NEW."accao","observacoes" = NEW."observacoes","geom" = NEW."geom" 
+    SET "oid" = COALESCE(NEW."oid",-1),"uniterr_oid" = NEW."uniterr_oid","classe" = 'Passagens hidráulicas',"tipo" = NEW."tipo","nome" = NEW."nome","estado" = NEW."estado","accao" = NEW."accao","observacoes" = NEW."observacoes","geom" = NEW."geom" 
     WHERE gid = OLD."gid";
 
 -- edificios
 CREATE OR REPLACE VIEW "PGHP".infra_edificios AS
 SELECT	"gid", "oid", "uniterr_oid", "tipo", "nome", "estado", "accao", "observacoes", "geom"::Geometry(MULTIPOLYGON, 3763),"time_start","time_end","user_update"
 FROM	"PGHP"."infraestruturas_poligonos"
-WHERE	"classe" = 'edificios' AND "time_end" IS NULL;
+WHERE	"classe" = 'Edifícios' AND "time_end" IS NULL;
 
 --CRIAR TRIGGERS E RULES para tornar a VIEW "Editável"
 CREATE OR REPLACE RULE "_DELETE" AS ON DELETE TO "PGHP".infra_edificios DO INSTEAD
   DELETE FROM "PGHP"."infraestruturas_poligonos" WHERE gid = OLD."gid";
 CREATE OR REPLACE RULE "_INSERT" AS ON INSERT TO "PGHP".infra_edificios DO INSTEAD
   INSERT INTO "PGHP"."infraestruturas_poligonos" ("oid","uniterr_oid","classe","tipo","nome","estado","accao","observacoes","geom")
-    VALUES (NEW."oid",NEW."uniterr_oid",'edificios',NEW."tipo",NEW."nome",NEW."estado",NEW."accao",NEW."observacoes",NEW."geom");
+    VALUES (NEW."oid",NEW."uniterr_oid",'Edifícios',NEW."tipo",NEW."nome",NEW."estado",NEW."accao",NEW."observacoes",NEW."geom");
 CREATE OR REPLACE RULE "_UPDATE" AS ON UPDATE TO "PGHP".infra_edificios DO INSTEAD
   UPDATE "PGHP"."infraestruturas_poligonos"
-    SET "oid" = COALESCE(NEW."oid",-1),"uniterr_oid" = NEW."uniterr_oid","classe" = 'edificios',"tipo" = NEW."tipo","nome" = NEW."nome","estado" = NEW."estado","accao" = NEW."accao","observacoes" = NEW."observacoes","geom" = NEW."geom" 
+    SET "oid" = COALESCE(NEW."oid",-1),"uniterr_oid" = NEW."uniterr_oid","classe" = 'Edifícios',"tipo" = NEW."tipo","nome" = NEW."nome","estado" = NEW."estado","accao" = NEW."accao","observacoes" = NEW."observacoes","geom" = NEW."geom" 
     WHERE gid = OLD."gid";
+
+-- View com todos os pontos a necessitar de reparação
+CREATE OR REPLACE VIEW "PGHP".infraestruturas_alertas AS
+SELECT
+	gid as gid,
+	classe as classe,
+	tipo as tipo,
+	estado as estado,
+	accao as accao,
+	(ST_PointOnSurface(geom))::Geometry(POINT, 3763) as geom
+FROM
+	"PGHP".infraestruturas
+WHERE
+	"time_end" IS NULL and NOT(estado = 'Bom estado') 

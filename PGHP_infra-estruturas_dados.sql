@@ -11,8 +11,8 @@ INSERT INTO "PGHP".infraestruturas_classe_tipo (classe, tipo) VALUES
 ('Sinalética','Sinais de trânsito'),
 ('Sinalética','Identificação de espécies'),
 ('Sinalética','Talhões oxigénio'),
-('Vedacoes','Elétrica fixa'),
-('Vedacoes','Elétrica amovível'),
+('Vedações','Elétrica fixa'),
+('Vedações','Elétrica amovível'),
 ('Vedações','Rede ovelheira'),
 ('Edifícios','Edifício'),
 ('Passagens hidráulicas','Passagem hidráulica');
@@ -33,5 +33,23 @@ INSERT INTO "PGHP".infraestruturas_accoes (accao) VALUES
 ('Substituir'),
 ('Retirar');
 
+-- Inserir dados antigos
+INSERT INTO "PGHP".infra_portoes ("uniterr_oid", "tipo", "nome", "cadeado", "estado", "accao", "observacoes", "geom")
+SELECT 
+1, tipo, nome, cadeado,estado, accao, observacoes, geom
+from "PGHP".portoes;
 
+INSERT INTO "PGHP".infra_sinaletica ("uniterr_oid", "tipo", "nome", "estado", "accao", "observacoes", "geom")
+SELECT 
+1, tipo, nome, estado, accao, observacoes, geom
+from "PGHP".sinaletica;
 
+INSERT INTO "PGHP".infra_vedacoes ("uniterr_oid", "tipo", "nome", "estado", "accao", "observacoes", "geom")
+SELECT 
+1, tipo, NULL, estado, accao, observacoes, geom
+from "PGHP".vedacoes;
+
+INSERT INTO "PGHP".infra_passagens_hidraulicas ("uniterr_oid", "tipo", "nome", "estado", "accao", "observacoes", "geom")
+SELECT 
+1, tipo, NULL, estado, accao, observacoes, geom
+from "PGHP".passagens_hidraulicas;
