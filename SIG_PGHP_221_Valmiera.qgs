@@ -2,17 +2,17 @@
 <qgis projectname="" version="2.2.0-Valmiera">
     <title></title>
     <relations>
-        <relation referencingLayer="unidadesdegestao20140210114731766" referencedLayer="unidadesterritoriais20140210114731498" id="unidadesdegestao20140210114731766_uniterr_oid_unidadesterritoriais20140210114731498_oid" name="uniterr-uniges">
-            <fieldRef referencedField="oid" referencingField="uniterr_oid"/>
+        <relation referencingLayer="acoes20140213101202661" referencedLayer="Proposta_de_Uso_copy20140210115305932" id="acoes20140213101202661_uniges_oid_Proposta_de_Uso_copy20140210115305932_uniges_oid" name="UG-to-ACCAO">
+            <fieldRef referencedField="uniges_oid" referencingField="uniges_oid"/>
         </relation>
     </relations>
     <mapcanvas>
         <units>meters</units>
         <extent>
-            <xmin>-113874.19161888837697916</xmin>
-            <ymin>-102605.05532202764879912</ymin>
-            <xmax>-109024.94354312980431132</xmax>
-            <ymax>-99567.77743077918421477</ymax>
+            <xmin>-112098.52135177126911003</xmin>
+            <ymin>-100579.8558748387004016</ymin>
+            <xmax>-111347.62360389229434077</xmax>
+            <ymax>-99940.91306274571979884</ymax>
         </extent>
         <projections>1</projections>
         <destinationsrs>
@@ -45,10 +45,10 @@
             <layer_coordinate_transform destAuthId="EPSG:3763" srcAuthId="EPSG:27493" srcDatumTransform="1983" destDatumTransform="1149" layerid="Veg_potencial20130923155515125"/>
         </layer_coordinate_transform_info>
     </mapcanvas>
-    <legend updateDrawingOrder="false" activeLayer="ribeiras20140213121006056">
+    <legend updateDrawingOrder="false" activeLayer="acoes_detalhe20140307154823635">
         <legendlayer drawingOrder="1" open="true" checked="Qt::Unchecked" name="acoes_detalhe" showFeatureCount="0">
             <filegroup open="true" hidden="false">
-                <legendlayerfile isInOverview="0" layerid="acoes_detalhe20140310155756576" visible="1"/>
+                <legendlayerfile isInOverview="0" layerid="acoes_detalhe20140310155756576" visible="0"/>
             </filegroup>
         </legendlayer>
         <legendlayer drawingOrder="2" open="true" checked="Qt::Unchecked" name="acoes_detalhe" showFeatureCount="0">
@@ -61,7 +61,7 @@
                 <legendlayerfile isInOverview="0" layerid="acoes_detalhe20140307154823635" visible="1"/>
             </filegroup>
         </legendlayer>
-        <legendgroup open="false" checked="Qt::Unchecked" name="Acções">
+        <legendgroup open="true" checked="Qt::Unchecked" name="Acções">
             <legendlayer drawingOrder="4" open="true" checked="Qt::Unchecked" name="acoes" showFeatureCount="0">
                 <filegroup open="true" hidden="false">
                     <legendlayerfile isInOverview="0" layerid="acoes20140213101202661" visible="0"/>
@@ -122,24 +122,24 @@
                 </filegroup>
             </legendlayer>
         </legendgroup>
-        <legendlayer drawingOrder="14" open="true" checked="Qt::Unchecked" name="ribeiras" showFeatureCount="0">
-            <filegroup open="true" hidden="false">
+        <legendlayer drawingOrder="14" open="false" checked="Qt::Unchecked" name="ribeiras" showFeatureCount="0">
+            <filegroup open="false" hidden="false">
                 <legendlayerfile isInOverview="0" layerid="ribeiras20140213121006056" visible="0"/>
             </filegroup>
         </legendlayer>
         <legendgroup open="true" checked="Qt::PartiallyChecked" name="Unidades de gestão">
-            <legendlayer drawingOrder="15" open="true" checked="Qt::Unchecked" name="Ocupação actual" showFeatureCount="0">
+            <legendlayer drawingOrder="15" open="true" checked="Qt::Checked" name="Ocupação actual" showFeatureCount="0">
                 <filegroup open="true" hidden="false">
-                    <legendlayerfile isInOverview="0" layerid="Proposta_de_Uso_copy20140210115305932" visible="0"/>
+                    <legendlayerfile isInOverview="0" layerid="Proposta_de_Uso_copy20140210115305932" visible="1"/>
                 </filegroup>
             </legendlayer>
-            <legendlayer drawingOrder="16" open="true" checked="Qt::Checked" name="Proposta de Uso" showFeatureCount="0">
+            <legendlayer drawingOrder="16" open="true" checked="Qt::Unchecked" name="Proposta de Uso" showFeatureCount="0">
                 <filegroup open="true" hidden="false">
-                    <legendlayerfile isInOverview="0" layerid="unidadesdegestao20140210114731766" visible="1"/>
+                    <legendlayerfile isInOverview="0" layerid="unidadesdegestao20140210114731766" visible="0"/>
                 </filegroup>
             </legendlayer>
         </legendgroup>
-        <legendgroup open="true" checked="Qt::Unchecked" name="Shapes antigas">
+        <legendgroup open="false" checked="Qt::Unchecked" name="Shapes antigas">
             <legendlayer drawingOrder="17" open="true" checked="Qt::Unchecked" name="veg_actual_concelho" showFeatureCount="0">
                 <filegroup open="true" hidden="false">
                     <legendlayerfile isInOverview="0" layerid="veg_actual20130807154829811" visible="0"/>
@@ -181,14 +181,14 @@
                 </filegroup>
             </legendlayer>
         </legendgroup>
-        <legendgroup open="true" checked="Qt::Checked" name="Ortofotos">
+        <legendgroup open="false" checked="Qt::Checked" name="Ortofotos">
             <legendlayer drawingOrder="25" open="false" checked="Qt::Checked" name="ortos2013" showFeatureCount="0">
                 <filegroup open="false" hidden="false">
                     <legendlayerfile isInOverview="0" layerid="ortos201320131023154350387" visible="1"/>
                 </filegroup>
             </legendlayer>
         </legendgroup>
-        <legendgroup open="true" checked="Qt::Unchecked" name="tabelas auxiliares">
+        <legendgroup open="false" checked="Qt::Unchecked" name="tabelas auxiliares">
             <legendlayer drawingOrder="26" open="true" checked="Qt::Unchecked" name="infraestruturas_classe_tipo" showFeatureCount="0">
                 <filegroup open="true" hidden="false">
                     <legendlayerfile isInOverview="0" layerid="infraestruturas_classe_tipo20140307154823768" visible="0"/>
@@ -3203,10 +3203,10 @@
             <provider encoding="ISO-8859-1">postgres</provider>
             <previewExpression></previewExpression>
             <vectorjoins/>
-            <editform></editform>
+            <editform>.</editform>
             <editforminit></editforminit>
             <featformsuppress>0</featformsuppress>
-            <annotationform></annotationform>
+            <annotationform>.</annotationform>
             <editorlayout>generatedlayout</editorlayout>
             <excludeAttributesWMS/>
             <excludeAttributesWFS/>
@@ -6311,10 +6311,10 @@
                 <edittype labelontop="0" editable="0" type="0" name="time_start"/>
                 <edittype labelontop="0" editable="0" type="0" name="user_update"/>
             </edittypes>
-            <editform></editform>
+            <editform>.</editform>
             <editforminit></editforminit>
             <featformsuppress>0</featformsuppress>
-            <annotationform></annotationform>
+            <annotationform>.</annotationform>
             <editorlayout>generatedlayout</editorlayout>
             <aliases>
                 <alias field="time_end" index="5" name=""/>
@@ -6614,10 +6614,10 @@
     <properties>
         <WMSContactPerson type="QString"></WMSContactPerson>
         <WMSOnlineResource type="QString"></WMSOnlineResource>
-        <WMSContactOrganization type="QString"></WMSContactOrganization>
         <DeprecatedLabels>
             <Enabled type="bool">true</Enabled>
         </DeprecatedLabels>
+        <WMSContactOrganization type="QString"></WMSContactOrganization>
         <WMSKeywordList type="QStringList">
             <value></value>
         </WMSKeywordList>
@@ -6645,8 +6645,8 @@
             <DegreeFormat type="QString">D</DegreeFormat>
         </PositionPrecision>
         <WCSUrl type="QString"></WCSUrl>
-        <WMSContactPhone type="QString"></WMSContactPhone>
         <WMSServiceCapabilities type="bool">false</WMSServiceCapabilities>
+        <WMSContactPhone type="QString"></WMSContactPhone>
         <WMSServiceAbstract type="QString"></WMSServiceAbstract>
         <WMSAddWktGeometry type="bool">false</WMSAddWktGeometry>
         <Measure>
