@@ -23,14 +23,23 @@ ALTER TABLE testes_versioning
     ADD COLUMN "vrs_start_time" timestamp without time zone,
     ADD COLUMN "vrs_start_user" character varying(40);
 
+-- ::FIXME create indexes to optimize queries
+CREATE INDEX testes_versioning_time_idx 
+  ON testes_versioning (vrs_start_time);
+
+
 -- create table to store backups
 CREATE TABLE testes_versioning_bk (
    like testes_versioning
 );
+
 ALTER TABLE testes_versioning_bk
    ADD COLUMN "vrs_gid" serial primary key,
    ADD COLUMN "vrs_end_time" timestamp without time zone,
    ADD COLUMN "vrs_end_user" character varying(40);
+
+CREATE INDEX testes_versioning_bk_idx
+ON time_limits (gid, vrs_start_time, vrs_end_tim);
 
 -- function and trigger to update versioning fields and backup old rows
 CREATE OR REPLACE FUNCTION "versioning"()
@@ -98,7 +107,7 @@ $$
 LANGUAGE 'sql';
 
 -- Function use example
-SELECT * from testes_versioning_at_time ('2014-04-08 16:12:29.832');
+SELECT * from testes_versioning_at_time ('2014-04-08 16:12:29.832') WHERE gid = 1;
 
 
 -- tests
