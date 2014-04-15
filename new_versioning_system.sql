@@ -1,61 +1,27 @@
-﻿/**
-DROP TABLE testes_versioning CASCADE;
-DROP TABLE testes_versioning_bk CASCADE;
-DROP FUNCTION "versioning"();
-**/
+﻿/** Add Versioning functionalities to database **/
+/**                Alexandre Neto              **/
+/**            senhor.neto@gmail.com           **/
+/**                 10-04-2014                 **/
 
--- the original table
-CREATE TABLE testes_versioning(
-gid serial primary key,
-descr varchar(40),
-geom geometry(MULTIPOLYGON,3763)
-);
-
-CREATE INDEX testes_versioning_idx
-  ON testes_versioning
-  USING gist
-  (geom);
-
--- VERSIONING ::FIXME Make function of this
-
--- add versioning fields
-ALTER TABLE testes_versioning
-    ADD COLUMN "vrs_start_time" timestamp without time zone,
-    ADD COLUMN "vrs_start_user" character varying(40);
-
--- ::FIXME create indexes to optimize queries
-CREATE INDEX testes_versioning_time_idx 
-  ON testes_versioning (vrs_start_time);
-
-
--- create table to store backups
-CREATE TABLE testes_versioning_bk (
-   like testes_versioning
-);
-
-ALTER TABLE testes_versioning_bk
-   ADD COLUMN "vrs_gid" serial primary key,
-   ADD COLUMN "vrs_end_time" timestamp without time zone,
-   ADD COLUMN "vrs_end_user" character varying(40);
-
-CREATE INDEX testes_versioning_bk_idx
-ON time_limits (gid, vrs_start_time, vrs_end_tim);
+-- VERSIONING
 
 -- function and trigger to update versioning fields and backup old rows
-CREATE OR REPLACE FUNCTION "versioning"()
+CREATE OR REPLACE FUNCTION "vrs_table_update"()
 RETURNS trigger AS
 $$
 BEGIN
+
     -- update versioning fields on original table
     IF TG_OP IN ('UPDATE','INSERT') THEN
         NEW."vrs_start_time" = now();
         NEW."vrs_start_user" = user;
     end IF;
 
-    -- send old row to backup table
+    -- move row to backup table
     IF TG_OP IN ('UPDATE','DELETE') THEN
-        INSERT INTO testes_versioning_bk
-            SELECT OLD.*;
+        EXECUTE 'INSERT INTO ' || quote_ident(TG_TABLE_SCHEMA) || '.' || quote_ident(TG_TABLE_NAME || '_bk') ||
+                ' SELECT ($1).*;'
+        USING OLD;
     end IF;
 
     IF TG_OP IN ('UPDATE','INSERT') THEN
@@ -67,11 +33,8 @@ end;
 $$
 LANGUAGE 'plpgsql';
 
-CREATE TRIGGER "testes_versioning_trigger" BEFORE INSERT OR DELETE OR UPDATE ON "testes_versioning"
-FOR EACH ROW EXECUTE PROCEDURE "versioning"();
-
--- function and trigger to register user and time of the backup
-CREATE OR REPLACE FUNCTION "bk_versioning"()
+-- function and trigger to register user and time of the row backup
+CREATE OR REPLACE FUNCTION "vsr_bk_table_update"()
 RETURNS trigger AS
 $$
 BEGIN
@@ -83,8 +46,75 @@ END;
 $$
 LANGUAGE 'plpgsql';
 
-CREATE TRIGGER "testes_versioning_bk_trigger" BEFORE INSERT ON "testes_versioning_bk"
-FOR EACH ROW EXECUTE PROCEDURE "bk_versioning"()
+CREATE OR REPLACE FUNCTION "vsr_add_versioning_to"(_t regclass) --::FIXME make table names in all formats work with or without commas
+  RETURNS void AS
+$body$
+DECLARE
+	table_name text;
+BEGIN
+	-- Clean table name and schema name to use in index and trigger names
+	IF _t::text LIKE '%.%' THEN
+		table_name := regexp_replace (split_part(_t::text, '.', 2),'"','','g');
+	ELSE
+		table_name := regexp_replace(_t::text,'"','','g');
+	END IF;
+	
+	-- add versioning fields to table
+	EXECUTE 'ALTER TABLE ' || _t || '
+		ADD COLUMN "vrs_start_time" timestamp without time zone,
+		ADD COLUMN "vrs_start_user" character varying(40)';
+
+        -- create indexes on versioning column to optimize queries ::FIXME (não funciona em schemas diferentes)
+	
+	EXECUTE 'CREATE INDEX "' || table_name || '_time_idx" 
+		ON ' || _t || ' (vrs_start_time)';
+
+	-- create table to store backups
+	EXECUTE 'CREATE TABLE ' || _t || '_bk (
+		like ' || _t || ')';
+
+	EXECUTE	'ALTER TABLE ' || _t || '_bk
+			ADD COLUMN "vrs_gid" serial primary key,
+			ADD COLUMN "vrs_end_time" timestamp without time zone,
+			ADD COLUMN "vrs_end_user" character varying(40)';
+
+	EXECUTE	'CREATE INDEX "' || table_name || '_bk_idx"
+		ON ' || _t || '_bk (gid, vrs_start_time, vrs_end_time)';
+
+	-- create trigger to update versioning fields in table
+	EXECUTE 'CREATE TRIGGER "' || table_name || '_vrs_trigger" BEFORE INSERT OR DELETE OR UPDATE ON ' || _t || '
+		FOR EACH ROW EXECUTE PROCEDURE "vrs_table_update"()';
+
+	-- create trigger to update versioning fields in backup table
+	EXECUTE 'CREATE TRIGGER "' || table_name || '_bk_trigger" BEFORE INSERT ON ' || _t || '_bk
+		FOR EACH ROW EXECUTE PROCEDURE "vsr_bk_table_update"()';
+END
+$body$ LANGUAGE plpgsql;
+
+-- Usage example
+/**
+DROP TABLE "PGHP_2".testes_versioning CASCADE;
+DROP TABLE "PGHP_2".testes_versioning_bk CASCADE;
+DROP FUNCTION "versioning"();
+**/
+
+-- the original table
+CREATE TABLE "PGHP_2"."testes versioning"(
+gid serial primary key,
+descr varchar(40),
+geom geometry(MULTIPOLYGON,3763)
+);
+
+CREATE INDEX testes_versioning_idx
+  ON "PGHP_2".testes_versioning
+  USING gist
+  (geom);
+
+-- Make table versionable
+-- This will create the backup table and related triggers
+
+SELECT vsr_add_versioning_to('"PGHP_2"."testes versioning"');
+
 
 -- Functions to visualize table in prior state in time
 CREATE OR REPLACE FUNCTION "testes_versioning_at_time"(timestamp without time zone)
@@ -118,5 +148,3 @@ UNION ALL
             WHERE table_name = 'testes_versioning_bk' 
             AND  c.column_name NOT IN ('vrs_end_time','vrs_end_user','vrs_gid')
     ), ', ') || ' FROM testes_versioning_bk As o');
-
-
