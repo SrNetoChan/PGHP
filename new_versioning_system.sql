@@ -104,6 +104,43 @@ $body$ LANGUAGE plpgsql;
 -- function to remove versioning from a table (including backup table)
 
 
+CREATE OR REPLACE FUNCTION "vsr_remove_versioning_from"(_t regclass)
+  RETURNS void AS
+$body$
+DECLARE
+	schema_name text;
+	table_name text;
+	bk_table_name text;
+BEGIN
+	-- Prepare names to use in index and trigger names
+	IF _t::text LIKE '%.%' THEN
+		schema_name := regexp_replace (split_part(_t::text, '.', 1),'"','','g');
+		table_name := regexp_replace (split_part(_t::text, '.', 2),'"','','g');
+	ELSE
+		schema_name := 'public';
+		table_name := regexp_replace(_t::text,'"','','g');
+	END IF;
+
+	bk_table_name := quote_ident(schema_name) || '.' || quote_ident(table_name || '_bk');
+	
+	-- Remove versioning fields from table
+	EXECUTE 'ALTER TABLE ' || _t ||
+		' DROP COLUMN IF EXISTS "vrs_start_time",
+		  DROP COLUMN IF EXISTS "vrs_start_user"';
+
+	-- Remove versioning trigger from table
+	EXECUTE 'DROP TRIGGER IF EXISTS ' || quote_ident(table_name || '_vrs_trigger') || ' ON ' || _t;
+
+	-- create table to store backups
+	EXECUTE 'DROP TABLE IF EXISTS ' || bk_table_name || ' CASCADE';
+END
+$body$ LANGUAGE plpgsql;
+
+
+
+
+
+
 -- Function to visualize tables in prior state in time
 -- ::FIXME to work with any versionalized table
 CREATE OR REPLACE FUNCTION "testes_versioning_at_time"(_t regclass, timestamp without time zone)
@@ -147,9 +184,14 @@ CREATE INDEX testes_versioning_idx
   (geom);
 
 -- Make table versionable
--- This will create the backup table and related triggers
+-- This will create the versioning fields, backup table and related triggers
 
-SELECT vsr_add_versioning_to('poligonos_teste-shp');
+SELECT vsr_add_versioning_to('testes_versioning');
+
+-- Remove versioning from table
+-- This will remove versioning fields, backup table and related triggers 
+
+SELECT vsr_remove_versioning_from('testes_versioning');
 
 -- See all table content at certain time
 SELECT * from testes_versioning_at_time ('2014-04-08 16:12:29.832');
