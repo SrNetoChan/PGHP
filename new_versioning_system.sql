@@ -46,78 +46,67 @@ END;
 $$
 LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION "vsr_add_versioning_to"(_t regclass) --::FIXME make table names in all formats work with or without commas
+CREATE OR REPLACE FUNCTION "vsr_add_versioning_to"(_t regclass)
   RETURNS void AS
 $body$
 DECLARE
+	schema_name text;
 	table_name text;
+	bk_table_name text;
 BEGIN
-	-- Clean table name and schema name to use in index and trigger names
+	-- Prepare names to use in index and trigger names
 	IF _t::text LIKE '%.%' THEN
+		schema_name := regexp_replace (split_part(_t::text, '.', 1),'"','','g');
 		table_name := regexp_replace (split_part(_t::text, '.', 2),'"','','g');
 	ELSE
+		schema_name := 'public';
 		table_name := regexp_replace(_t::text,'"','','g');
 	END IF;
+
+	bk_table_name := quote_ident(schema_name) || '.' || quote_ident(table_name || '_bk');
 	
 	-- add versioning fields to table
-	EXECUTE 'ALTER TABLE ' || _t || '
-		ADD COLUMN "vrs_start_time" timestamp without time zone,
-		ADD COLUMN "vrs_start_user" character varying(40)';
+	EXECUTE 'ALTER TABLE ' || _t ||
+		' ADD COLUMN "vrs_start_time" timestamp without time zone,
+		  ADD COLUMN "vrs_start_user" character varying(40)';
 
-        -- create indexes on versioning column to optimize queries ::FIXME (não funciona em schemas diferentes)
+        -- create indexes on versioning column to optimize queries
 	
-	EXECUTE 'CREATE INDEX "' || table_name || '_time_idx" 
-		ON ' || _t || ' (vrs_start_time)';
+	EXECUTE 'CREATE INDEX ' || quote_ident(table_name || '_time_idx') ||
+		' ON ' || _t || ' (vrs_start_time)';
+
+	-- populate versioning fields with values (useful is table already has data)
+	EXECUTE 'UPDATE ' || _t || ' SET vrs_start_time = now(), vrs_start_user = user';
 
 	-- create table to store backups
-	EXECUTE 'CREATE TABLE ' || _t || '_bk (
-		like ' || _t || ')';
+	EXECUTE 'CREATE TABLE ' || bk_table_name ||
+		' (like ' || _t || ')';
 
-	EXECUTE	'ALTER TABLE ' || _t || '_bk
-			ADD COLUMN "vrs_gid" serial primary key,
-			ADD COLUMN "vrs_end_time" timestamp without time zone,
-			ADD COLUMN "vrs_end_user" character varying(40)';
+	EXECUTE	'ALTER TABLE ' || bk_table_name ||
+		' ADD COLUMN "vrs_gid" serial primary key,
+		  ADD COLUMN "vrs_end_time" timestamp without time zone,
+		  ADD COLUMN "vrs_end_user" character varying(40)';
 
-	EXECUTE	'CREATE INDEX "' || table_name || '_bk_idx"
-		ON ' || _t || '_bk (gid, vrs_start_time, vrs_end_time)';
+	EXECUTE	'CREATE INDEX ' || quote_ident(table_name || '_bk_idx') || 
+		' ON ' || bk_table_name || ' (gid, vrs_start_time, vrs_end_time)';
 
 	-- create trigger to update versioning fields in table
-	EXECUTE 'CREATE TRIGGER "' || table_name || '_vrs_trigger" BEFORE INSERT OR DELETE OR UPDATE ON ' || _t || '
-		FOR EACH ROW EXECUTE PROCEDURE "vrs_table_update"()';
+	EXECUTE 'CREATE TRIGGER ' || quote_ident(table_name || '_vrs_trigger') || ' BEFORE INSERT OR DELETE OR UPDATE ON ' || _t ||
+		' FOR EACH ROW EXECUTE PROCEDURE "vrs_table_update"()';
 
 	-- create trigger to update versioning fields in backup table
-	EXECUTE 'CREATE TRIGGER "' || table_name || '_bk_trigger" BEFORE INSERT ON ' || _t || '_bk
-		FOR EACH ROW EXECUTE PROCEDURE "vsr_bk_table_update"()';
+	EXECUTE 'CREATE TRIGGER ' || quote_ident(table_name || '_bk_trigger') || ' BEFORE INSERT ON ' || bk_table_name ||
+		' FOR EACH ROW EXECUTE PROCEDURE "vsr_bk_table_update"()';
 END
 $body$ LANGUAGE plpgsql;
 
--- Usage example
-/**
-DROP TABLE "PGHP_2".testes_versioning CASCADE;
-DROP TABLE "PGHP_2".testes_versioning_bk CASCADE;
-DROP FUNCTION "versioning"();
-**/
-
--- the original table
-CREATE TABLE "PGHP_2"."testes versioning"(
-gid serial primary key,
-descr varchar(40),
-geom geometry(MULTIPOLYGON,3763)
-);
-
-CREATE INDEX testes_versioning_idx
-  ON "PGHP_2".testes_versioning
-  USING gist
-  (geom);
-
--- Make table versionable
--- This will create the backup table and related triggers
-
-SELECT vsr_add_versioning_to('"PGHP_2"."testes versioning"');
+-- ::FIXME CREATE OR REPLACE FUNCTION "vsr_remove_versioning_from" (_t regclass)
+-- function to remove versioning from a table (including backup table)
 
 
--- Functions to visualize table in prior state in time
-CREATE OR REPLACE FUNCTION "testes_versioning_at_time"(timestamp without time zone)
+-- Function to visualize tables in prior state in time
+-- ::FIXME to work with any versionalized table
+CREATE OR REPLACE FUNCTION "testes_versioning_at_time"(_t regclass, timestamp without time zone)
 RETURNS SETOF "testes_versioning" AS
 $$
 	WITH all_table as 
@@ -136,11 +125,42 @@ $$
 $$
 LANGUAGE 'sql';
 
--- Function use example
+
+
+-- USAGE EXAMPLE
+/**
+DROP TABLE "PGHP_2".testes_versioning CASCADE;
+DROP TABLE "PGHP_2".testes_versioning_bk CASCADE;
+DROP FUNCTION "versioning"();
+**/
+
+-- the original table
+CREATE TABLE testes_versioning(
+gid serial primary key,
+descr varchar(40),
+geom geometry(MULTIPOLYGON,3763)
+);
+
+CREATE INDEX testes_versioning_idx
+  ON testes_versioning
+  USING gist
+  (geom);
+
+-- Make table versionable
+-- This will create the backup table and related triggers
+
+SELECT vsr_add_versioning_to('poligonos_teste-shp');
+
+-- See all table content at certain time
+SELECT * from testes_versioning_at_time ('2014-04-08 16:12:29.832');
+
+-- specific element at certains time
 SELECT * from testes_versioning_at_time ('2014-04-08 16:12:29.832') WHERE gid = 1;
 
 
--- tests
+
+--TESTING
+
 SELECT * FROM testes_versioning
 UNION ALL
 (SELECT 'SELECT ' || array_to_string(ARRAY(SELECT 'o' || '.' || c.column_name
