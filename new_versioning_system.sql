@@ -47,7 +47,7 @@ $$
 LANGUAGE 'plpgsql';
 
 CREATE OR REPLACE FUNCTION "vsr_add_versioning_to"(_t regclass)
-  RETURNS void AS
+  RETURNS boolean AS
 $body$
 DECLARE
 	schema_name text;
@@ -97,15 +97,13 @@ BEGIN
 	-- create trigger to update versioning fields in backup table
 	EXECUTE 'CREATE TRIGGER ' || quote_ident(table_name || '_bk_trigger') || ' BEFORE INSERT ON ' || bk_table_name ||
 		' FOR EACH ROW EXECUTE PROCEDURE "vsr_bk_table_update"()';
+	RETURN true;
 END
 $body$ LANGUAGE plpgsql;
 
--- ::FIXME CREATE OR REPLACE FUNCTION "vsr_remove_versioning_from" (_t regclass)
 -- function to remove versioning from a table (including backup table)
-
-
 CREATE OR REPLACE FUNCTION "vsr_remove_versioning_from"(_t regclass)
-  RETURNS void AS
+  RETURNS boolean AS
 $body$
 DECLARE
 	schema_name text;
@@ -133,13 +131,10 @@ BEGIN
 
 	-- create table to store backups
 	EXECUTE 'DROP TABLE IF EXISTS ' || bk_table_name || ' CASCADE';
+
+	RETURN true;
 END
 $body$ LANGUAGE plpgsql;
-
-
-
-
-
 
 -- Function to visualize tables in prior state in time
 -- ::FIXME to work with any versionalized table
@@ -172,26 +167,26 @@ DROP FUNCTION "versioning"();
 **/
 
 -- the original table
-CREATE TABLE testes_versioning(
+CREATE TABLE "PGHP_2".testes_versioning(
 gid serial primary key,
 descr varchar(40),
 geom geometry(MULTIPOLYGON,3763)
 );
 
 CREATE INDEX testes_versioning_idx
-  ON testes_versioning
+  ON "PGHP_2".testes_versioning
   USING gist
   (geom);
 
 -- Make table versionable
 -- This will create the versioning fields, backup table and related triggers
 
-SELECT vsr_add_versioning_to('testes_versioning');
+SELECT vsr_add_versioning_to('"PGHP_2".testes_versioning');
 
 -- Remove versioning from table
 -- This will remove versioning fields, backup table and related triggers 
 
-SELECT vsr_remove_versioning_from('testes_versioning');
+SELECT vsr_remove_versioning_from('"PGHP_2".testes_versioning');
 
 -- See all table content at certain time
 SELECT * from testes_versioning_at_time ('2014-04-08 16:12:29.832');
