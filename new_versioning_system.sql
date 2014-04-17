@@ -138,24 +138,46 @@ $body$ LANGUAGE plpgsql;
 
 -- Function to visualize tables in prior state in time
 -- ::FIXME to work with any versionalized table
-CREATE OR REPLACE FUNCTION "testes_versioning_at_time"(_t regclass, timestamp without time zone)
-RETURNS SETOF "testes_versioning" AS
+CREATE OR REPLACE FUNCTION "testes_versioning_at_time"(_t regclass, _d timestamp without time zone)
+RETURNS SETOF _t AS
 $$
-	WITH all_table as 
+DECLARE
+	bk_sql text;
+	schema_name_in text;
+	table_name_in text;
+	bk_table_name text;
+BEGIN
+		-- Prepare names to use in index and trigger names
+	IF _t::text LIKE '%.%' THEN
+		schema_name_in := regexp_replace (split_part(_t::text, '.', 1),'"','','g');
+		table_name_in := regexp_replace (split_part(_t::text, '.', 2),'"','','g');
+	ELSE
+		schema_name_in := 'public';
+		table_name_in := regexp_replace(_t::text,'"','','g');
+	END IF;
+
+	bk_table_name := quote_ident(schema_name) || '.' || quote_ident(table_name || '_bk');
+
+	bk_sql := (SELECT 'SELECT ' || array_to_string(ARRAY(SELECT 'o' || '.' || c.column_name
+		FROM information_schema.columns As c
+		WHERE schema_name = schema_name_in and table_name = table_name_in 
+		AND  c.column_name NOT IN ('vrs_end_time','vrs_end_user','vrs_gid')
+		), ', ') || ' FROM ' || bk_table_name || ' As o WHERE o.vrs_start_time <= '|| _d ||' and o.vrs_end_time > '|| _d );
+
+	EXECUTE 'WITH all_table as 
 	(
 		SELECT * 
-		  FROM testes_versioning as f 
+		  FROM '|| _t ||' as f 
 		  WHERE f.vrs_start_time <= $1
-		UNION ALL
-		SELECT o.gid, o.descr, o.geom, o.vrs_start_time, o.vrs_start_user
-		  FROM testes_versioning_bk As o 
-		  WHERE o.vrs_start_time <= $1 AND o.vrs_end_time > $1
+		UNION ALL ' ||
+		bk_sql || '
 	)
 	SELECT DISTINCT ON (gid) *
 	  FROM all_table
-	  ORDER BY gid, vrs_start_time DESC;
+	  ORDER BY gid, vrs_start_time DESC';
+END
 $$
-LANGUAGE 'sql';
+LANGUAGE plpgsql;
 
 
 
@@ -189,7 +211,7 @@ SELECT vsr_add_versioning_to('"PGHP_2".testes_versioning');
 SELECT vsr_remove_versioning_from('"PGHP_2".testes_versioning');
 
 -- See all table content at certain time
-SELECT * from testes_versioning_at_time ('2014-04-08 16:12:29.832');
+SELECT * from testes_versioning_at_time ('2014-04-16 17:38:25.862');
 
 -- specific element at certains time
 SELECT * from testes_versioning_at_time ('2014-04-08 16:12:29.832') WHERE gid = 1;
@@ -197,11 +219,29 @@ SELECT * from testes_versioning_at_time ('2014-04-08 16:12:29.832') WHERE gid = 
 
 
 --TESTING
+	WITH all_table as 
+	(
+		SELECT * 
+		  FROM "PGHP_2".testes_versioning as f 
+		  WHERE f.vrs_start_time <= '2014-04-16 18:24:25.862'
+		UNION ALL
+		SELECT o.gid, o.descr, o.geom, o.vrs_start_time, o.vrs_start_user
+		  FROM "PGHP_2".testes_versioning_bk As o 
+		  WHERE o.vrs_start_time <= '2014-04-16 18:24:25.862' AND o.vrs_end_time > '2014-04-16 18:24:25.862'
+	)
+	SELECT DISTINCT ON (gid) *
+	  FROM all_table
+	  ORDER BY gid, vrs_start_time DESC;
 
-SELECT * FROM testes_versioning
+
+
+
+SELECT *, '' FROM "PGHP_2".testes_versioning
 UNION ALL
 (SELECT 'SELECT ' || array_to_string(ARRAY(SELECT 'o' || '.' || c.column_name
         FROM information_schema.columns As c
-            WHERE table_name = 'testes_versioning_bk' 
+            WHERE table_schema = 'PGHP_2' and table_name = 'testes_versioning_bk' 
             AND  c.column_name NOT IN ('vrs_end_time','vrs_end_user','vrs_gid')
-    ), ', ') || ' FROM testes_versioning_bk As o');
+    ), ', ') || ' FROM "PGHP_2".testes_versioning_bk As o');
+
+SELECT * from information_schema.columns WHERE table_name = 'testes_versioning_bk' and table_schema = 'PGHP_2'
