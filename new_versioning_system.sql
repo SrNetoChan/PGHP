@@ -3,9 +3,7 @@
 /**            senhor.neto@gmail.com           **/
 /**                 10-04-2014                 **/
 
--- VERSIONING
-
--- function and trigger to update versioning fields and backup old rows
+-- Create function for trigger to update versioning fields and backup old rows
 CREATE OR REPLACE FUNCTION "vrs_table_update"()
 RETURNS trigger AS
 $$
@@ -33,7 +31,7 @@ end;
 $$
 LANGUAGE 'plpgsql';
 
--- function and trigger to register user and time of the row backup
+-- Create function for trigger to register user and time of the row backup
 CREATE OR REPLACE FUNCTION "vsr_bk_table_update"()
 RETURNS trigger AS
 $$
@@ -46,24 +44,26 @@ END;
 $$
 LANGUAGE 'plpgsql';
 
+-- Function to create the versioning fields, backup table and related triggers on a table
 CREATE OR REPLACE FUNCTION "vsr_add_versioning_to"(_t regclass)
   RETURNS boolean AS
 $body$
 DECLARE
-	schema_name text;
-	table_name text;
+	_schema text;
+	_table text;
 	bk_table_name text;
 BEGIN
 	-- Prepare names to use in index and trigger names
 	IF _t::text LIKE '%.%' THEN
-		schema_name := regexp_replace (split_part(_t::text, '.', 1),'"','','g');
-		table_name := regexp_replace (split_part(_t::text, '.', 2),'"','','g');
+		_schema := regexp_replace (split_part(_t::text, '.', 1),'"','','g');
+		_table := regexp_replace (split_part(_t::text, '.', 2),'"','','g');
 	ELSE
-		schema_name := 'public';
-		table_name := regexp_replace(_t::text,'"','','g');
+		_schema := 'public';
+		_table := regexp_replace(_t::text,'"','','g');
 	END IF;
 
-	bk_table_name := quote_ident(schema_name) || '.' || quote_ident(table_name || '_bk');
+	-- compose backup table name
+	bk_table_name := quote_ident(_schema) || '.' || quote_ident(_table || '_bk');
 	
 	-- add versioning fields to table
 	EXECUTE 'ALTER TABLE ' || _t ||
@@ -72,7 +72,7 @@ BEGIN
 
         -- create indexes on versioning column to optimize queries
 	
-	EXECUTE 'CREATE INDEX ' || quote_ident(table_name || '_time_idx') ||
+	EXECUTE 'CREATE INDEX ' || quote_ident(_table || '_time_idx') ||
 		' ON ' || _t || ' (vrs_start_time)';
 
 	-- populate versioning fields with values (useful is table already has data)
@@ -87,15 +87,15 @@ BEGIN
 		  ADD COLUMN "vrs_end_time" timestamp without time zone,
 		  ADD COLUMN "vrs_end_user" character varying(40)';
 
-	EXECUTE	'CREATE INDEX ' || quote_ident(table_name || '_bk_idx') || 
+	EXECUTE	'CREATE INDEX ' || quote_ident(_table || '_bk_idx') || 
 		' ON ' || bk_table_name || ' (gid, vrs_start_time, vrs_end_time)';
 
 	-- create trigger to update versioning fields in table
-	EXECUTE 'CREATE TRIGGER ' || quote_ident(table_name || '_vrs_trigger') || ' BEFORE INSERT OR DELETE OR UPDATE ON ' || _t ||
+	EXECUTE 'CREATE TRIGGER ' || quote_ident(_table || '_vrs_trigger') || ' BEFORE INSERT OR DELETE OR UPDATE ON ' || _t ||
 		' FOR EACH ROW EXECUTE PROCEDURE "vrs_table_update"()';
 
 	-- create trigger to update versioning fields in backup table
-	EXECUTE 'CREATE TRIGGER ' || quote_ident(table_name || '_bk_trigger') || ' BEFORE INSERT ON ' || bk_table_name ||
+	EXECUTE 'CREATE TRIGGER ' || quote_ident(_table || '_bk_trigger') || ' BEFORE INSERT ON ' || bk_table_name ||
 		' FOR EACH ROW EXECUTE PROCEDURE "vsr_bk_table_update"()';
 	RETURN true;
 END
@@ -106,20 +106,21 @@ CREATE OR REPLACE FUNCTION "vsr_remove_versioning_from"(_t regclass)
   RETURNS boolean AS
 $body$
 DECLARE
-	schema_name text;
-	table_name text;
-	bk_table_name text;
+	_schema text;
+	_table text;
+	_table_bk text;
 BEGIN
 	-- Prepare names to use in index and trigger names
 	IF _t::text LIKE '%.%' THEN
-		schema_name := regexp_replace (split_part(_t::text, '.', 1),'"','','g');
-		table_name := regexp_replace (split_part(_t::text, '.', 2),'"','','g');
+		_schema := regexp_replace (split_part(_t::text, '.', 1),'"','','g');
+		_table := regexp_replace (split_part(_t::text, '.', 2),'"','','g');
 	ELSE
-		schema_name := 'public';
-		table_name := regexp_replace(_t::text,'"','','g');
+		_schema := 'public';
+		_table := regexp_replace(_t::text,'"','','g');
 	END IF;
 
-	bk_table_name := quote_ident(schema_name) || '.' || quote_ident(table_name || '_bk');
+	-- compose backup table name
+	_table_bk := quote_ident(_schema) || '.' || quote_ident(_table || '_bk');
 	
 	-- Remove versioning fields from table
 	EXECUTE 'ALTER TABLE ' || _t ||
@@ -127,17 +128,16 @@ BEGIN
 		  DROP COLUMN IF EXISTS "vrs_start_user"';
 
 	-- Remove versioning trigger from table
-	EXECUTE 'DROP TRIGGER IF EXISTS ' || quote_ident(table_name || '_vrs_trigger') || ' ON ' || _t;
+	EXECUTE 'DROP TRIGGER IF EXISTS ' || quote_ident(_table || '_vrs_trigger') || ' ON ' || _t;
 
 	-- create table to store backups
-	EXECUTE 'DROP TABLE IF EXISTS ' || bk_table_name || ' CASCADE';
+	EXECUTE 'DROP TABLE IF EXISTS ' || _table_bk || ' CASCADE';
 
 	RETURN true;
 END
 $body$ LANGUAGE plpgsql;
 
 -- Function to visualize tables in prior state in time
--- ::FIXME to work with any versionalized table
 CREATE OR REPLACE FUNCTION "vsr_table_at_time"(_t anyelement, _d timestamp)
 RETURNS SETOF anyelement AS
 $$
@@ -158,13 +158,14 @@ BEGIN
 		_table := regexp_replace(_tfn,'"','','g');
 	END IF;
 
+	-- compose backup table name
 	_table_bk := quote_ident(_schema) || '.' || quote_ident(_table || '_bk');
 
 	-- getting columns from table
 	_col := (SELECT array_to_string(ARRAY(SELECT 'o' || '.' || c.column_name
 			FROM information_schema.columns As c
 			WHERE table_schema = _schema and table_name = _table), ', '));
-
+	
 	RETURN QUERY EXECUTE format(
 	'WITH g as 
 		(
