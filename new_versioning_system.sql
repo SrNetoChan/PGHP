@@ -3,17 +3,70 @@
 /**            senhor.neto@gmail.com           **/
 /**                 10-04-2014                 **/
 
+
+/** Create first and last aggregation functions to use
+    Original code is from https://wiki.postgresql.org/wiki/First/last_(aggregate)**/
+
+CREATE OR REPLACE FUNCTION public.first_agg ( anyelement, anyelement )
+RETURNS anyelement LANGUAGE sql IMMUTABLE STRICT AS $$
+        SELECT $1;
+$$;
+ 
+-- And then wrap an aggregate around it
+CREATE AGGREGATE public.first (
+        sfunc    = public.first_agg,
+        basetype = anyelement,
+        stype    = anyelement
+);
+ 
+-- Create a function that always returns the last non-NULL item
+CREATE OR REPLACE FUNCTION public.last_agg ( anyelement, anyelement )
+RETURNS anyelement LANGUAGE sql IMMUTABLE STRICT AS $$
+        SELECT $2;
+$$;
+ 
+-- And then wrap an aggregate around it
+CREATE AGGREGATE public.last (
+        sfunc    = public.last_agg,
+        basetype = anyelement,
+        stype    = anyelement
+);
+
+-- Install hstore EXTENSION
+CREATE EXTENSION hstore;
+
+
 -- Create function for trigger to update versioning fields and backup old rows
 CREATE OR REPLACE FUNCTION "vrs_table_update"()
 RETURNS trigger AS
 $$
+DECLARE
+	_new_h hstore;
+	_old_h hstore;
+	diff hstore;
+	fields text;
+	
 BEGIN
-    IF TG_OP IN ('UPDATE','DELETE') THEN
-	-- move row to backup table
+
+    IF TG_OP = 'UPDATE' THEN
+	_new_h := hstore(NEW);
+	_old_h := hstore(OLD);
+	
+	fields := right(left(akeys((hstore(NEW)-hstore(OLD))::hstore)::text,-1),-1);
+
+	-- move changed columns to backup table
+        EXECUTE 'INSERT INTO ' || quote_ident(TG_TABLE_SCHEMA) || '.' || quote_ident(TG_TABLE_NAME || '_bk') || ' (gid, ' || fields ||')' ||
+                ' VALUES (($1).gid, ($1).'|| replace(fields,',',', ($1).') ||')'
+        USING OLD;
+
+    END IF;
+
+    IF TG_OP = 'DELETE' THEN
+	-- move complete row to backup table
         EXECUTE 'INSERT INTO ' || quote_ident(TG_TABLE_SCHEMA) || '.' || quote_ident(TG_TABLE_NAME || '_bk') ||
                 ' SELECT ($1).*;'
         USING OLD;
-    end IF;
+    END IF;
 
     IF TG_OP IN ('UPDATE','INSERT') THEN
 	-- update versioning fields on original table
