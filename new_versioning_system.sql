@@ -41,24 +41,22 @@ CREATE OR REPLACE FUNCTION "vrs_table_update"()
 RETURNS trigger AS
 $$
 DECLARE
-	_new_h hstore;
-	_old_h hstore;
-	diff hstore;
 	fields text;
-	
 BEGIN
+    IF TG_OP IN ('UPDATE','INSERT') THEN
+	-- update versioning fields on original table
+	NEW."vrs_start_time" = now();
+        NEW."vrs_start_user" = user;
+    END IF;
 
     IF TG_OP = 'UPDATE' THEN
-	_new_h := hstore(NEW);
-	_old_h := hstore(OLD);
-	
-	fields := right(left(akeys((hstore(NEW)-hstore(OLD))::hstore)::text,-1),-1);
+	--get a list of changed fields
+	fields := 'gid,' || right(left(akeys((hstore(NEW)-hstore(OLD))::hstore)::text,-1),-1);
 
 	-- move changed columns to backup table
-        EXECUTE 'INSERT INTO ' || quote_ident(TG_TABLE_SCHEMA) || '.' || quote_ident(TG_TABLE_NAME || '_bk') || ' (gid, ' || fields ||')' ||
-                ' VALUES (($1).gid, ($1).'|| replace(fields,',',', ($1).') ||')'
+        EXECUTE 'INSERT INTO ' || quote_ident(TG_TABLE_SCHEMA) || '.' || quote_ident(TG_TABLE_NAME || '_bk') || ' (' || fields ||')' ||
+                ' VALUES (($1).'|| replace(fields,',',', ($1).') ||')'
         USING OLD;
-
     END IF;
 
     IF TG_OP = 'DELETE' THEN
@@ -69,9 +67,6 @@ BEGIN
     END IF;
 
     IF TG_OP IN ('UPDATE','INSERT') THEN
-	-- update versioning fields on original table
-	NEW."vrs_start_time" = now();
-        NEW."vrs_start_user" = user;
         RETURN NEW;
     ELSE
         RETURN OLD;
@@ -187,6 +182,7 @@ END
 $body$ LANGUAGE plpgsql;
 
 -- Function to visualize tables in prior state in time
+-- FIXME:: first function is returning varchar instead of varchar(40)
 CREATE OR REPLACE FUNCTION "vsr_table_at_time"(_t anyelement, _d timestamp)
 RETURNS SETOF anyelement AS
 $$
@@ -196,6 +192,7 @@ DECLARE
 	_table text;
 	_table_bk text;
 	_col text;
+	_col2 text;
 BEGIN
 	-- Separate schema and table names
 	_tfn := pg_typeof(_t)::text;
@@ -214,21 +211,23 @@ BEGIN
 	_col := (SELECT array_to_string(ARRAY(SELECT 'o' || '.' || c.column_name
 			FROM information_schema.columns As c
 			WHERE table_schema = _schema and table_name = _table), ', '));
+	_col2 := (SELECT array_to_string(ARRAY(SELECT 'first(g.' || c.column_name || ') as ' || c.column_name
+			FROM information_schema.columns As c
+			WHERE table_schema = _schema and table_name = _table), ', '));
 	
 	RETURN QUERY EXECUTE format(
 	'WITH g as 
 		(
-		SELECT * 
-		  FROM %s AS f 
-		  WHERE f.vrs_start_time <= $1
-		UNION ALL
 		SELECT %s
 		  FROM %s AS o 
 		  WHERE o.vrs_start_time <= $1 AND o.vrs_end_time > $1
+		UNION ALL
+		SELECT * 
+		  FROM %s AS f
 		)
-	SELECT DISTINCT ON (gid) *
+	SELECT %s
 	  FROM g
-	  ORDER BY gid, vrs_start_time DESC', pg_typeof(_t), _col, _table_bk)
+	  GROUP BY gid', _col, _table_bk, pg_typeof(_t), _col2)
 	  USING _d;
 END
 $$
@@ -236,6 +235,7 @@ LANGUAGE plpgsql;
 
 -- USAGE EXAMPLE
 -- the original table
+-- ATTENTION: for now, the name "gid" must be used as primary key
 CREATE TABLE "PGHP_2".testes_versioning(
 gid serial primary key,
 descr varchar(40),
@@ -258,7 +258,7 @@ SELECT vsr_add_versioning_to('"PGHP_2".testes_versioning');
 SELECT vsr_remove_versioning_from('"PGHP_2".testes_versioning');
 
 -- See table content at certain time
-SELECT * from vsr_table_at_time (NULL::"PGHP_2".testes_versioning, '2014-04-19 18:26:57');
+SELECT * from vsr_table_at_time (NULL::"PGHP_2".testes_versioning, '2014-04-22 14:47:44.008');
 
 -- See specific feature at certain time
 SELECT * from vsr_table_at_time (NULL::"PGHP_2".testes_versioning, '2014-04-19 18:26:57') WHERE gid = 1;
