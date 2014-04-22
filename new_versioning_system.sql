@@ -8,26 +8,22 @@ CREATE OR REPLACE FUNCTION "vrs_table_update"()
 RETURNS trigger AS
 $$
 BEGIN
-
-    -- update versioning fields on original table
-    IF TG_OP IN ('UPDATE','INSERT') THEN
-        NEW."vrs_start_time" = now();
-        NEW."vrs_start_user" = user;
-    end IF;
-
-    -- move row to backup table
     IF TG_OP IN ('UPDATE','DELETE') THEN
+	-- move row to backup table
         EXECUTE 'INSERT INTO ' || quote_ident(TG_TABLE_SCHEMA) || '.' || quote_ident(TG_TABLE_NAME || '_bk') ||
                 ' SELECT ($1).*;'
         USING OLD;
     end IF;
 
     IF TG_OP IN ('UPDATE','INSERT') THEN
+	-- update versioning fields on original table
+	NEW."vrs_start_time" = now();
+        NEW."vrs_start_user" = user;
         RETURN NEW;
     ELSE
         RETURN OLD;
-    end IF;
-end;
+    END IF;
+END;
 $$
 LANGUAGE 'plpgsql';
 
