@@ -1,17 +1,13 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
 <qgis projectname="" version="2.2.0-Valmiera">
     <title></title>
-    <relations>
-        <relation referencingLayer="acoes20140213101202661" referencedLayer="Proposta_de_Uso_copy20140210115305932" id="acoes20140213101202661_uniges_oid_Proposta_de_Uso_copy20140210115305932_uniges_oid" name="UG-to-ACCAO">
-            <fieldRef referencedField="uniges_oid" referencingField="uniges_oid"/>
-        </relation>
-    </relations>
+    <relations/>
     <mapcanvas>
         <units>meters</units>
         <extent>
-            <xmin>-112098.52135177126911003</xmin>
+            <xmin>-112113.6017192195286043</xmin>
             <ymin>-100579.8558748387004016</ymin>
-            <xmax>-111347.62360389229434077</xmax>
+            <xmax>-111332.5432364440348465</xmax>
             <ymax>-99940.91306274571979884</ymax>
         </extent>
         <projections>1</projections>
@@ -128,11 +124,6 @@
             </filegroup>
         </legendlayer>
         <legendgroup open="true" checked="Qt::PartiallyChecked" name="Unidades de gestão">
-            <legendlayer drawingOrder="15" open="true" checked="Qt::Checked" name="Ocupação actual" showFeatureCount="0">
-                <filegroup open="true" hidden="false">
-                    <legendlayerfile isInOverview="0" layerid="Proposta_de_Uso_copy20140210115305932" visible="1"/>
-                </filegroup>
-            </legendlayer>
             <legendlayer drawingOrder="16" open="true" checked="Qt::Unchecked" name="Proposta de Uso" showFeatureCount="0">
                 <filegroup open="true" hidden="false">
                     <legendlayerfile isInOverview="0" layerid="unidadesdegestao20140210114731766" visible="0"/>
@@ -1532,7 +1523,7 @@
             </ComposerMap>
         </Composition>
     </Composer>
-    <projectlayers layercount="36">
+    <projectlayers layercount="35">
         <maplayer minimumScale="0" maximumScale="1e+08" simplifyDrawingHints="1" minLabelScale="1" maxLabelScale="1e+08" simplifyDrawingTol="1" geometry="Polygon" simplifyMaxScale="1" type="vector" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
             <id>Areas_Plantacao_Ecoparque20130314162023762</id>
             <datasource>../../../Geodados/NovosGeodados/Projectos/Ecoparque/Areas_Plantacao_Ecoparque.shp</datasource>
@@ -2102,357 +2093,6 @@
                 <multilineenabled fieldname="" on=""/>
                 <selectedonly on=""/>
             </labelattributes>
-            <editform>../../Quinta do Pisao_Parque Natureza/05 Plano de Gestão da Biodiversidade/Dados</editform>
-            <editforminit></editforminit>
-            <featformsuppress>0</featformsuppress>
-            <annotationform>../../Quinta do Pisao_Parque Natureza/05 Plano de Gestão da Biodiversidade/Dados</annotationform>
-            <editorlayout>generatedlayout</editorlayout>
-            <excludeAttributesWMS/>
-            <excludeAttributesWFS/>
-            <attributeactions/>
-        </maplayer>
-        <maplayer minimumScale="0" maximumScale="1e+08" simplifyDrawingHints="1" minLabelScale="1" maxLabelScale="1e+08" simplifyDrawingTol="1" geometry="Polygon" simplifyMaxScale="1" type="vector" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
-            <id>Proposta_de_Uso_copy20140210115305932</id>
-            <datasource>dbname='postgis' host=192.168.100.7 port=5432 sslmode=disable key='gid' srid=3763 type=MULTIPOLYGON table="PGHP"."unidadesdegestao" (geom) sql=</datasource>
-            <title></title>
-            <abstract></abstract>
-            <keywordList>
-                <value></value>
-            </keywordList>
-            <layername>Ocupação actual</layername>
-            <srs>
-                <spatialrefsys>
-                    <proj4>+proj=tmerc +lat_0=39.66825833333333 +lon_0=-8.133108333333334 +k=1 +x_0=0 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
-                    <srsid>1721</srsid>
-                    <srid>3763</srid>
-                    <authid>EPSG:3763</authid>
-                    <description>ETRS89 / Portugal TM06</description>
-                    <projectionacronym>tmerc</projectionacronym>
-                    <ellipsoidacronym>GRS80</ellipsoidacronym>
-                    <geographicflag>false</geographicflag>
-                </spatialrefsys>
-            </srs>
-            <provider encoding="ISO-8859-1">postgres</provider>
-            <previewExpression>COALESCE( "gid", '&lt;NULL>' )</previewExpression>
-            <vectorjoins/>
-            <renderer-v2 attr="prop_uso" symbollevels="0" type="categorizedSymbol">
-                <categories>
-                    <category symbol="0" value="Agrícola" label="Agrícola"/>
-                    <category symbol="1" value="Área social" label="Área social"/>
-                    <category symbol="2" value="Caminho" label="Caminho"/>
-                    <category symbol="3" value="Floresta" label="Floresta"/>
-                    <category symbol="4" value="Floresta aberta" label="Floresta aberta"/>
-                    <category symbol="5" value="Lagoa" label="Lagoa"/>
-                    <category symbol="6" value="Linha de água" label="Linha de água"/>
-                    <category symbol="7" value="Mato e prado" label="Mato e prado"/>
-                    <category symbol="8" value="Prado" label="Prado"/>
-                </categories>
-                <symbols>
-                    <symbol alpha="0.49" type="fill" name="0">
-                        <layer pass="0" class="SimpleFill" locked="0">
-                            <prop k="border_width_unit" v="MM"/>
-                            <prop k="color" v="191,89,55,255"/>
-                            <prop k="color_border" v="0,0,0,255"/>
-                            <prop k="offset" v="0,0"/>
-                            <prop k="offset_unit" v="MM"/>
-                            <prop k="style" v="solid"/>
-                            <prop k="style_border" v="solid"/>
-                            <prop k="width_border" v="0.26"/>
-                        </layer>
-                    </symbol>
-                    <symbol alpha="0.49" type="fill" name="1">
-                        <layer pass="0" class="LinePatternFill" locked="1">
-                            <prop k="color" v="170,0,0,255"/>
-                            <prop k="distance" v="2"/>
-                            <prop k="distance_unit" v="MM"/>
-                            <prop k="line_width_unit" v="MM"/>
-                            <prop k="lineangle" v="45"/>
-                            <prop k="linewidth" v="0.4"/>
-                            <prop k="offset" v="1"/>
-                            <prop k="offset_unit" v="MM"/>
-                            <symbol alpha="1" type="line" name="@1@0">
-                                <layer pass="0" class="SimpleLine" locked="0">
-                                    <prop k="capstyle" v="round"/>
-                                    <prop k="color" v="180,19,22,255"/>
-                                    <prop k="customdash" v="5;2"/>
-                                    <prop k="customdash_unit" v="MM"/>
-                                    <prop k="draw_inside_polygon" v="0"/>
-                                    <prop k="joinstyle" v="round"/>
-                                    <prop k="offset" v="0"/>
-                                    <prop k="offset_unit" v="MM"/>
-                                    <prop k="penstyle" v="solid"/>
-                                    <prop k="use_custom_dash" v="0"/>
-                                    <prop k="width" v="0.3"/>
-                                    <prop k="width_unit" v="MM"/>
-                                </layer>
-                            </symbol>
-                        </layer>
-                    </symbol>
-                    <symbol alpha="0.49" type="fill" name="2">
-                        <layer pass="0" class="SimpleFill" locked="0">
-                            <prop k="border_width_unit" v="MM"/>
-                            <prop k="color" v="235,237,210,255"/>
-                            <prop k="color_border" v="0,0,0,255"/>
-                            <prop k="offset" v="0,0"/>
-                            <prop k="offset_unit" v="MM"/>
-                            <prop k="style" v="solid"/>
-                            <prop k="style_border" v="solid"/>
-                            <prop k="width_border" v="0.26"/>
-                        </layer>
-                    </symbol>
-                    <symbol alpha="0.49" type="fill" name="3">
-                        <layer pass="0" class="SimpleFill" locked="0">
-                            <prop k="border_width_unit" v="MM"/>
-                            <prop k="color" v="68,146,84,255"/>
-                            <prop k="color_border" v="0,0,0,255"/>
-                            <prop k="offset" v="0,0"/>
-                            <prop k="offset_unit" v="MM"/>
-                            <prop k="style" v="solid"/>
-                            <prop k="style_border" v="solid"/>
-                            <prop k="width_border" v="0.26"/>
-                        </layer>
-                    </symbol>
-                    <symbol alpha="0.49" type="fill" name="4">
-                        <layer pass="0" class="SimpleFill" locked="0">
-                            <prop k="border_width_unit" v="MM"/>
-                            <prop k="color" v="195,245,103,255"/>
-                            <prop k="color_border" v="0,0,0,255"/>
-                            <prop k="offset" v="0,0"/>
-                            <prop k="offset_unit" v="MM"/>
-                            <prop k="style" v="solid"/>
-                            <prop k="style_border" v="solid"/>
-                            <prop k="width_border" v="0.26"/>
-                        </layer>
-                    </symbol>
-                    <symbol alpha="0.49" type="fill" name="5">
-                        <layer pass="0" class="SimpleFill" locked="0">
-                            <prop k="border_width_unit" v="MM"/>
-                            <prop k="color" v="119,213,218,255"/>
-                            <prop k="color_border" v="0,0,0,255"/>
-                            <prop k="offset" v="0,0"/>
-                            <prop k="offset_unit" v="MM"/>
-                            <prop k="style" v="solid"/>
-                            <prop k="style_border" v="solid"/>
-                            <prop k="width_border" v="0.26"/>
-                        </layer>
-                    </symbol>
-                    <symbol alpha="0.49" type="fill" name="6">
-                        <layer pass="0" class="SimpleFill" locked="0">
-                            <prop k="border_width_unit" v="MM"/>
-                            <prop k="color" v="89,160,181,255"/>
-                            <prop k="color_border" v="0,0,0,255"/>
-                            <prop k="offset" v="0,0"/>
-                            <prop k="offset_unit" v="MM"/>
-                            <prop k="style" v="solid"/>
-                            <prop k="style_border" v="solid"/>
-                            <prop k="width_border" v="0.26"/>
-                        </layer>
-                    </symbol>
-                    <symbol alpha="0.49" type="fill" name="7">
-                        <layer pass="0" class="SimpleFill" locked="0">
-                            <prop k="border_width_unit" v="MM"/>
-                            <prop k="color" v="141,26,28,255"/>
-                            <prop k="color_border" v="0,0,0,255"/>
-                            <prop k="offset" v="0,0"/>
-                            <prop k="offset_unit" v="MM"/>
-                            <prop k="style" v="solid"/>
-                            <prop k="style_border" v="solid"/>
-                            <prop k="width_border" v="0.26"/>
-                        </layer>
-                    </symbol>
-                    <symbol alpha="0.49" type="fill" name="8">
-                        <layer pass="0" class="SimpleFill" locked="0">
-                            <prop k="border_width_unit" v="MM"/>
-                            <prop k="color" v="255,151,46,255"/>
-                            <prop k="color_border" v="0,0,0,255"/>
-                            <prop k="offset" v="0,0"/>
-                            <prop k="offset_unit" v="MM"/>
-                            <prop k="style" v="solid"/>
-                            <prop k="style_border" v="solid"/>
-                            <prop k="width_border" v="0.26"/>
-                        </layer>
-                    </symbol>
-                </symbols>
-                <source-symbol>
-                    <symbol alpha="1" type="fill" name="0">
-                        <layer pass="0" class="SimpleFill" locked="0">
-                            <prop k="border_width_unit" v="MM"/>
-                            <prop k="color" v="164,93,153,255"/>
-                            <prop k="color_border" v="0,0,0,255"/>
-                            <prop k="offset" v="0,0"/>
-                            <prop k="offset_unit" v="MM"/>
-                            <prop k="style" v="solid"/>
-                            <prop k="style_border" v="solid"/>
-                            <prop k="width_border" v="0.26"/>
-                        </layer>
-                    </symbol>
-                </source-symbol>
-                <colorramp type="gradient" name="[source]">
-                    <prop k="color1" v="166,97,26,255"/>
-                    <prop k="color2" v="1,133,113,255"/>
-                    <prop k="discrete" v="0"/>
-                    <prop k="stops" v="0.25;223,194,125,255:0.5;245,245,245,255:0.75;128,205,193,255"/>
-                </colorramp>
-                <invertedcolorramp value="0"/>
-                <rotation/>
-                <sizescale scalemethod="area"/>
-            </renderer-v2>
-            <customproperties>
-                <property key="labeling" value="pal"/>
-                <property key="labeling/addDirectionSymbol" value="false"/>
-                <property key="labeling/angleOffset" value="0"/>
-                <property key="labeling/blendMode" value="0"/>
-                <property key="labeling/bufferBlendMode" value="0"/>
-                <property key="labeling/bufferColorA" value="255"/>
-                <property key="labeling/bufferColorB" value="255"/>
-                <property key="labeling/bufferColorG" value="255"/>
-                <property key="labeling/bufferColorR" value="255"/>
-                <property key="labeling/bufferDraw" value="true"/>
-                <property key="labeling/bufferJoinStyle" value="64"/>
-                <property key="labeling/bufferNoFill" value="false"/>
-                <property key="labeling/bufferSize" value="1"/>
-                <property key="labeling/bufferSizeInMapUnits" value="false"/>
-                <property key="labeling/bufferTransp" value="0"/>
-                <property key="labeling/centroidWhole" value="false"/>
-                <property key="labeling/decimals" value="0"/>
-                <property key="labeling/displayAll" value="false"/>
-                <property key="labeling/dist" value="0"/>
-                <property key="labeling/distInMapUnits" value="false"/>
-                <property key="labeling/enabled" value="true"/>
-                <property key="labeling/fieldName" value="uniges_oid"/>
-                <property key="labeling/fontBold" value="false"/>
-                <property key="labeling/fontCapitals" value="0"/>
-                <property key="labeling/fontFamily" value="MS Shell Dlg 2"/>
-                <property key="labeling/fontItalic" value="false"/>
-                <property key="labeling/fontLetterSpacing" value="0"/>
-                <property key="labeling/fontLimitPixelSize" value="false"/>
-                <property key="labeling/fontMaxPixelSize" value="10000"/>
-                <property key="labeling/fontMinPixelSize" value="3"/>
-                <property key="labeling/fontSize" value="6.25"/>
-                <property key="labeling/fontSizeInMapUnits" value="false"/>
-                <property key="labeling/fontStrikeout" value="false"/>
-                <property key="labeling/fontUnderline" value="false"/>
-                <property key="labeling/fontWeight" value="50"/>
-                <property key="labeling/fontWordSpacing" value="0"/>
-                <property key="labeling/formatNumbers" value="false"/>
-                <property key="labeling/isExpression" value="false"/>
-                <property key="labeling/labelOffsetInMapUnits" value="true"/>
-                <property key="labeling/labelPerPart" value="false"/>
-                <property key="labeling/leftDirectionSymbol" value="&lt;"/>
-                <property key="labeling/limitNumLabels" value="false"/>
-                <property key="labeling/maxCurvedCharAngleIn" value="20"/>
-                <property key="labeling/maxCurvedCharAngleOut" value="-20"/>
-                <property key="labeling/maxNumLabels" value="2000"/>
-                <property key="labeling/mergeLines" value="false"/>
-                <property key="labeling/minFeatureSize" value="0"/>
-                <property key="labeling/multilineAlign" value="0"/>
-                <property key="labeling/multilineHeight" value="1.5"/>
-                <property key="labeling/namedStyle" value="Normal"/>
-                <property key="labeling/obstacle" value="true"/>
-                <property key="labeling/placeDirectionSymbol" value="0"/>
-                <property key="labeling/placement" value="0"/>
-                <property key="labeling/placementFlags" value="0"/>
-                <property key="labeling/plussign" value="false"/>
-                <property key="labeling/preserveRotation" value="true"/>
-                <property key="labeling/previewBkgrdColor" value="#ffffff"/>
-                <property key="labeling/priority" value="10"/>
-                <property key="labeling/quadOffset" value="4"/>
-                <property key="labeling/reverseDirectionSymbol" value="false"/>
-                <property key="labeling/rightDirectionSymbol" value=">"/>
-                <property key="labeling/scaleMax" value="10000000"/>
-                <property key="labeling/scaleMin" value="1"/>
-                <property key="labeling/scaleVisibility" value="false"/>
-                <property key="labeling/shadowBlendMode" value="6"/>
-                <property key="labeling/shadowColorB" value="0"/>
-                <property key="labeling/shadowColorG" value="0"/>
-                <property key="labeling/shadowColorR" value="0"/>
-                <property key="labeling/shadowDraw" value="false"/>
-                <property key="labeling/shadowOffsetAngle" value="135"/>
-                <property key="labeling/shadowOffsetDist" value="1"/>
-                <property key="labeling/shadowOffsetGlobal" value="true"/>
-                <property key="labeling/shadowOffsetUnits" value="1"/>
-                <property key="labeling/shadowRadius" value="1.5"/>
-                <property key="labeling/shadowRadiusAlphaOnly" value="false"/>
-                <property key="labeling/shadowRadiusUnits" value="1"/>
-                <property key="labeling/shadowScale" value="100"/>
-                <property key="labeling/shadowTransparency" value="30"/>
-                <property key="labeling/shadowUnder" value="0"/>
-                <property key="labeling/shapeBlendMode" value="0"/>
-                <property key="labeling/shapeBorderColorA" value="255"/>
-                <property key="labeling/shapeBorderColorB" value="128"/>
-                <property key="labeling/shapeBorderColorG" value="128"/>
-                <property key="labeling/shapeBorderColorR" value="128"/>
-                <property key="labeling/shapeBorderWidth" value="0"/>
-                <property key="labeling/shapeBorderWidthUnits" value="1"/>
-                <property key="labeling/shapeDraw" value="false"/>
-                <property key="labeling/shapeFillColorA" value="255"/>
-                <property key="labeling/shapeFillColorB" value="255"/>
-                <property key="labeling/shapeFillColorG" value="255"/>
-                <property key="labeling/shapeFillColorR" value="255"/>
-                <property key="labeling/shapeJoinStyle" value="64"/>
-                <property key="labeling/shapeOffsetUnits" value="1"/>
-                <property key="labeling/shapeOffsetX" value="0"/>
-                <property key="labeling/shapeOffsetY" value="0"/>
-                <property key="labeling/shapeRadiiUnits" value="1"/>
-                <property key="labeling/shapeRadiiX" value="0"/>
-                <property key="labeling/shapeRadiiY" value="0"/>
-                <property key="labeling/shapeRotation" value="0"/>
-                <property key="labeling/shapeRotationType" value="0"/>
-                <property key="labeling/shapeSVGFile" value=""/>
-                <property key="labeling/shapeSizeType" value="0"/>
-                <property key="labeling/shapeSizeUnits" value="1"/>
-                <property key="labeling/shapeSizeX" value="0"/>
-                <property key="labeling/shapeSizeY" value="0"/>
-                <property key="labeling/shapeTransparency" value="0"/>
-                <property key="labeling/shapeType" value="0"/>
-                <property key="labeling/textColorA" value="255"/>
-                <property key="labeling/textColorB" value="0"/>
-                <property key="labeling/textColorG" value="0"/>
-                <property key="labeling/textColorR" value="0"/>
-                <property key="labeling/textTransp" value="0"/>
-                <property key="labeling/upsidedownLabels" value="0"/>
-                <property key="labeling/wrapChar" value=" + "/>
-                <property key="labeling/xOffset" value="0"/>
-                <property key="labeling/yOffset" value="0"/>
-            </customproperties>
-            <blendMode>0</blendMode>
-            <featureBlendMode>0</featureBlendMode>
-            <layerTransparency>0</layerTransparency>
-            <displayfield>gid</displayfield>
-            <label>0</label>
-            <labelfield>gid</labelfield>
-            <labelattributes>
-                <label fieldname="gid" text="Etiqueta"/>
-                <family fieldname="" name="MS Shell Dlg 2"/>
-                <size fieldname="" units="pt" value="12"/>
-                <bold fieldname="" on="0"/>
-                <italic fieldname="" on="0"/>
-                <underline fieldname="" on="0"/>
-                <strikeout fieldname="" on="0"/>
-                <color fieldname="" red="0" blue="0" green="0"/>
-                <x fieldname=""/>
-                <y fieldname=""/>
-                <offset x="0" y="0" units="pt" yfieldname="" xfieldname=""/>
-                <angle fieldname="" value="0" auto="0"/>
-                <alignment fieldname="" value="center"/>
-                <buffercolor fieldname="" red="255" blue="255" green="255"/>
-                <buffersize fieldname="" units="pt" value="1"/>
-                <bufferenabled fieldname="" on=""/>
-                <multilineenabled fieldname="" on=""/>
-                <selectedonly on=""/>
-            </labelattributes>
-            <edittypes>
-                <edittype labelontop="0" editable="1" type="0" name="act_composicao"/>
-                <edittype labelontop="0" editable="1" allowNull="false" orderByValue="true" key="nome" layer="usos20140213144836437" allowMulti="false" filterExpression="" type="15" value="nome" name="act_uso"/>
-                <edittype labelontop="0" editable="1" type="0" name="gid"/>
-                <edittype labelontop="0" editable="1" type="0" name="nome"/>
-                <edittype labelontop="0" editable="1" type="0" name="prop_composicao"/>
-                <edittype labelontop="0" editable="1" type="0" name="prop_data_limite"/>
-                <edittype labelontop="0" editable="1" allowNull="false" orderByValue="true" key="nome" layer="usos20140213144836437" allowMulti="false" filterExpression="" type="15" value="nome" name="prop_uso"/>
-                <edittype labelontop="0" editable="1" type="0" name="uniges_cod"/>
-                <edittype labelontop="0" editable="1" type="0" name="uniges_oid"/>
-                <edittype labelontop="0" editable="1" allowNull="false" orderByValue="true" key="oid" layer="unidadesterritoriais20140210114731498" allowMulti="false" filterExpression="" type="15" value="nome" name="uniterr_oid"/>
-            </edittypes>
             <editform>../../Quinta do Pisao_Parque Natureza/05 Plano de Gestão da Biodiversidade/Dados</editform>
             <editforminit></editforminit>
             <featformsuppress>0</featformsuppress>
@@ -6614,10 +6254,10 @@
     <properties>
         <WMSContactPerson type="QString"></WMSContactPerson>
         <WMSOnlineResource type="QString"></WMSOnlineResource>
+        <WMSContactOrganization type="QString"></WMSContactOrganization>
         <DeprecatedLabels>
             <Enabled type="bool">true</Enabled>
         </DeprecatedLabels>
-        <WMSContactOrganization type="QString"></WMSContactOrganization>
         <WMSKeywordList type="QStringList">
             <value></value>
         </WMSKeywordList>
@@ -6645,8 +6285,8 @@
             <DegreeFormat type="QString">D</DegreeFormat>
         </PositionPrecision>
         <WCSUrl type="QString"></WCSUrl>
-        <WMSServiceCapabilities type="bool">false</WMSServiceCapabilities>
         <WMSContactPhone type="QString"></WMSContactPhone>
+        <WMSServiceCapabilities type="bool">false</WMSServiceCapabilities>
         <WMSServiceAbstract type="QString"></WMSServiceAbstract>
         <WMSAddWktGeometry type="bool">false</WMSAddWktGeometry>
         <Measure>
