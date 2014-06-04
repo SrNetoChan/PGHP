@@ -199,6 +199,38 @@ BEGIN
 END
 $body$ LANGUAGE plpgsql;
 
+-- Function to obtain a column data type
+CREATE OR REPLACE FUNCTION "vsr_get_data_type"(_t regclass, _c text)
+  RETURNS text AS
+$body$
+DECLARE
+	_schema text;
+	_table text;
+	data_type text;
+BEGIN
+	-- Prepare names to use in index and trigger names
+	IF _t::text LIKE '%.%' THEN
+		_schema := regexp_replace (split_part(_t::text, '.', 1),'"','','g');
+		_table := regexp_replace (split_part(_t::text, '.', 2),'"','','g');
+	ELSE
+		_schema := 'public';
+		_table := regexp_replace(_t::text,'"','','g');
+	END IF;
+
+	data_type := (SELECT format_type(a.atttypid, a.atttypmod)
+	FROM pg_attribute a 
+	JOIN pg_class b ON (a.attrelid = b.relfilenode)
+	JOIN pg_namespace c ON (c.oid = b.relnamespace)
+WHERE
+	b.relname = _table AND
+	c.nspname = _schema AND
+	a.attname = _c);
+	
+	RETURN data_type;
+END
+$body$ LANGUAGE plpgsql;
+
+
 -- Function to visualize tables in prior state in time
 -- FIXME:: first function is returning varchar instead of varchar(40)
 CREATE OR REPLACE FUNCTION "vsr_table_at_time"(_t anyelement, _d timestamp)
@@ -225,13 +257,16 @@ BEGIN
 	-- compose backup table name
 	_table_bk := quote_ident(_schema) || '.' || quote_ident(_table || '_bk');
 
-	-- getting columns from table
+	-- preparing list of columns from table separated by commas
+	-- this gets simple list of columns
 	_col := (SELECT array_to_string(ARRAY(SELECT 'o' || '.' || c.column_name
 			FROM information_schema.columns As c
 			WHERE table_schema = _schema and table_name = _table), ', '));
-	_col2 := (SELECT array_to_string(ARRAY(SELECT 'first(g.' || c.column_name || ') as ' || c.column_name
+	--this gets list of columns with aggregation function and data type casting
+	_col2 := (SELECT array_to_string(ARRAY(SELECT 'first(g' || '.' || c.column_name || ')::' || vsr_get_data_type(_tfn,c.column_name) || ' as ' || c.column_name
 			FROM information_schema.columns As c
-			WHERE table_schema = _schema and table_name = _table), ', '));
+			WHERE table_schema = _schema and table_name = _table
+						), ', '));
 	
 	RETURN QUERY EXECUTE format(
 	'WITH g as 
@@ -276,7 +311,7 @@ SELECT vsr_add_versioning_to('"PGHP_2".testes_versioning');
 SELECT vsr_remove_versioning_from('"PGHP_2".testes_versioning');
 
 -- See table content at certain time
-SELECT * from vsr_table_at_time (NULL::"PGHP_2".testes_versioning, '2014-04-22 14:47:44.008');
+SELECT * from vsr_table_at_time (NULL::"PGHP_2".testes_versioning, '2014-04-22  14:47:44.008');
 
 -- See specific feature at certain time
 SELECT * from vsr_table_at_time (NULL::"PGHP_2".testes_versioning, '2014-04-19 18:26:57') WHERE gid = 1;
