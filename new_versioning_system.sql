@@ -28,6 +28,7 @@
 
  
 -- Install hstore EXTENSION
+DROP EXTENSION IF EXISTS hstore;
 CREATE EXTENSION hstore;
 
 -- Create trigger fucntion to update versioning fields and backup old rows
@@ -83,6 +84,7 @@ $$
 LANGUAGE 'plpgsql';
 
 -- Function to create the versioning fields, backup table and related triggers on a table
+-- ::FIXME need to remove NOT NULL constraints from backup tables
 CREATE OR REPLACE FUNCTION "vsr_add_versioning_to"(_t regclass)
   RETURNS boolean AS
 $body$
@@ -119,6 +121,7 @@ BEGIN
 	-- create table to store backups
 	EXECUTE 'CREATE TABLE ' || bk_table_name ||
 		' (like ' || _t || ')';
+		
 
 	EXECUTE	'ALTER TABLE ' || bk_table_name ||
 		' ADD COLUMN "vrs_gid" serial primary key,
@@ -216,7 +219,7 @@ RETURNS anyelement LANGUAGE sql IMMUTABLE STRICT AS $$
 $$;
  
 -- And then wrap an aggregate around it
-DROP AGGREGATE public.first(anyelement);
+DROP AGGREGATE IF EXISTS public.first(anyelement);
 CREATE AGGREGATE public.first (
         sfunc    = public.first_agg,
         basetype = anyelement,
@@ -278,35 +281,3 @@ BEGIN
 END
 $$
 LANGUAGE plpgsql;
-
-
-
--- USAGE EXAMPLE
--- the original table
--- ATTENTION: for now, the name "gid" must be always used as primary key
-CREATE TABLE "PGHP_2".testes_versioning(
-gid serial primary key,
-descr varchar(40),
-geom geometry(MULTIPOLYGON,3763)
-);
-
-CREATE INDEX testes_versioning_idx
-  ON "PGHP_2".testes_versioning
-  USING gist
-  (geom);
-
--- Make table versionable
--- This will create the versioning fields, backup table and related triggers
-
-SELECT vsr_add_versioning_to('"PGHP_2".testes_versioning');
-
--- Remove versioning from table
--- This will remove versioning fields, backup table and related triggers 
-
-SELECT vsr_remove_versioning_from('"PGHP_2".testes_versioning');
-
--- See table content at certain time
-SELECT * from vsr_table_at_time (NULL::"PGHP_2".testes_versioning, '2014-06-04 16:10:00');
-
--- See specific feature at certain time
-SELECT * from vsr_table_at_time (NULL::"PGHP_2".testes_versioning, '2014-04-19 18:26:57') WHERE gid = 1;
