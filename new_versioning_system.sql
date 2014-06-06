@@ -22,39 +22,15 @@
 /**                                                                        **/
 /****************************************************************************/
 
-/** Create first and last aggregation functions to use
-    Original code is from https://wiki.postgresql.org/wiki/First/last_(aggregate)**/
+-- ::FIXME do function to get backup table name from original table
+-- ::FIXME do function to get schema and table names from concatenated table name
+-- ::FIXME allow other names for primary keys
 
-CREATE OR REPLACE FUNCTION public.first_agg ( anyelement, anyelement )
-RETURNS anyelement LANGUAGE sql IMMUTABLE STRICT AS $$
-        SELECT $1;
-$$;
  
--- And then wrap an aggregate around it
-CREATE AGGREGATE public.first (
-        sfunc    = public.first_agg,
-        basetype = anyelement,
-        stype    = anyelement
-);
- 
--- Create a function that always returns the last non-NULL item
-CREATE OR REPLACE FUNCTION public.last_agg ( anyelement, anyelement )
-RETURNS anyelement LANGUAGE sql IMMUTABLE STRICT AS $$
-        SELECT $2;
-$$;
- 
--- And then wrap an aggregate around it
-CREATE AGGREGATE public.last (
-        sfunc    = public.last_agg,
-        basetype = anyelement,
-        stype    = anyelement
-);
-
 -- Install hstore EXTENSION
 CREATE EXTENSION hstore;
 
-
--- Create function for trigger to update versioning fields and backup old rows
+-- Create trigger fucntion to update versioning fields and backup old rows
 CREATE OR REPLACE FUNCTION "vrs_table_update"()
 RETURNS trigger AS
 $$
@@ -231,8 +207,24 @@ END
 $body$ LANGUAGE plpgsql;
 
 
+-- Create first aggregation functions to use in "vsr_table_at_time"
+-- Original code is from https://wiki.postgresql.org/wiki/First/last_(aggregate)
+
+CREATE OR REPLACE FUNCTION public.first_agg ( anyelement, anyelement )
+RETURNS anyelement LANGUAGE sql IMMUTABLE STRICT AS $$
+        SELECT $1;
+$$;
+ 
+-- And then wrap an aggregate around it
+DROP AGGREGATE public.first(anyelement);
+CREATE AGGREGATE public.first (
+        sfunc    = public.first_agg,
+        basetype = anyelement,
+        stype    = anyelement
+);
+
+
 -- Function to visualize tables in prior state in time
--- FIXME:: first function is returning varchar instead of varchar(40)
 CREATE OR REPLACE FUNCTION "vsr_table_at_time"(_t anyelement, _d timestamp)
 RETURNS SETOF anyelement AS
 $$
@@ -263,6 +255,7 @@ BEGIN
 			FROM information_schema.columns As c
 			WHERE table_schema = _schema and table_name = _table), ', '));
 	--this gets list of columns with aggregation function and data type casting
+	--casting is needed in order to allow "return set of anyelement"
 	_col2 := (SELECT array_to_string(ARRAY(SELECT 'first(g' || '.' || c.column_name || ')::' || vsr_get_data_type(_tfn,c.column_name) || ' as ' || c.column_name
 			FROM information_schema.columns As c
 			WHERE table_schema = _schema and table_name = _table
@@ -286,9 +279,11 @@ END
 $$
 LANGUAGE plpgsql;
 
+
+
 -- USAGE EXAMPLE
 -- the original table
--- ATTENTION: for now, the name "gid" must be used as primary key
+-- ATTENTION: for now, the name "gid" must be always used as primary key
 CREATE TABLE "PGHP_2".testes_versioning(
 gid serial primary key,
 descr varchar(40),
