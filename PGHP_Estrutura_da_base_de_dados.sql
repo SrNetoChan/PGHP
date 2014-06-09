@@ -2,7 +2,9 @@
   DROP TABLE IF EXISTS "PGHP_2".unidadesterritoriais CASCADE;
   DROP TABLE IF EXISTS "PGHP_2".usos CASCADE;
   DROP TABLE IF EXISTS "PGHP_2".unidadesdegestao_bk CASCADE;
-  DROP TABLE IF EXISTS "PGHP_2".unidadesterritoriais_bk CASCADE; */
+  DROP TABLE IF EXISTS "PGHP_2".unidadesterritoriais_bk CASCADE;
+  DROP TABLE IF EXISTS "PGHP_2".unidadesdegestao_linhas_bk CASCADE;
+  DROP TABLE IF EXISTS "PGHP_2".unidadesdegestao_poligonos_bk CASCADE; */
 
 
 -- UNIDADES TERRITORIAIS --
@@ -50,7 +52,7 @@ CREATE TABLE "PGHP_2".unidadesdegestao
   act_composicao character varying(50),
   prop_uso character varying(30) REFERENCES "PGHP_2".usos(nome) ON UPDATE CASCADE ON DELETE RESTRICT,
   prop_composicao character varying(50),
-  prop_data_limite date,
+  prop_data_limite timestamp without time zone,
   geom geometry(geometry, 3763)
 );
 
