@@ -84,7 +84,6 @@ $$
 LANGUAGE 'plpgsql';
 
 -- Function to create the versioning fields, backup table and related triggers on a table
--- ::FIXME need to remove NOT NULL constraints from backup tables
 CREATE OR REPLACE FUNCTION "vsr_add_versioning_to"(_t regclass)
   RETURNS boolean AS
 $body$
@@ -121,12 +120,25 @@ BEGIN
 	-- create table to store backups
 	EXECUTE 'CREATE TABLE ' || bk_table_name ||
 		' (like ' || _t || ')';
-		
+
+	-- Drop NOT NULL constraints from backup table
+	EXECUTE (SELECT 'ALTER TABLE '|| bk_table_name || ' ALTER '
+			|| string_agg (quote_ident(attname), ' DROP NOT NULL, ALTER ')
+			|| ' DROP NOT NULL'
+		FROM   pg_catalog.pg_attribute
+		WHERE  attrelid = bk_table_name::regclass
+		AND    attnotnull
+		AND    NOT attisdropped
+		AND    attnum > 0
+		AND    attname NOT like 'vrs%'
+		);
 
 	EXECUTE	'ALTER TABLE ' || bk_table_name ||
 		' ADD COLUMN "vrs_gid" serial primary key,
 		  ADD COLUMN "vrs_end_time" timestamp without time zone,
 		  ADD COLUMN "vrs_end_user" character varying(40)';
+
+	-- ::FIXME add spatial index to spatial tables
 
 	EXECUTE	'CREATE INDEX ' || quote_ident(_table || '_bk_idx') || 
 		' ON ' || bk_table_name || ' (gid, vrs_start_time, vrs_end_time)';
