@@ -59,10 +59,6 @@ CREATE INDEX unidadesdegestao_idx
   USING gist
   (geom);
 
--- Criar versioning --
-
-SELECT vsr_add_versioning_to('"PGHP_2".unidadesdegestao');
-
 -- Tabela inherits das unidades de gestao para geometrias de linhas (child)
 CREATE TABLE "PGHP_2".unidadesdegestao_linhas
 (
@@ -72,8 +68,8 @@ CREATE TABLE "PGHP_2".unidadesdegestao_linhas
 	CONSTRAINT unidadesdegestao_linhas_pk PRIMARY KEY (gid),
 	CONSTRAINT unidadesdegestao_linhas_oid_key UNIQUE (oid),
 	CONSTRAINT unidadesdegestao_unidadesterritoriais_fkey FOREIGN KEY (uniterr_oid) REFERENCES "PGHP_2".unidadesterritoriais(oid) ON UPDATE CASCADE ON DELETE RESTRICT,
-	CONSTRAINT unidadesdegestao_linhas_act_uso_fkey FOREIGN KEY (nome) REFERENCES "PGHP_2".usos (nome) ON UPDATE CASCADE ON DELETE RESTRICT,
-	CONSTRAINT unidadesdegestao_linhas_prop_uso_fkey FOREIGN KEY (nome) REFERENCES "PGHP_2".usos (nome) ON UPDATE CASCADE ON DELETE RESTRICT
+	CONSTRAINT unidadesdegestao_linhas_act_uso_fkey FOREIGN KEY (act_uso) REFERENCES "PGHP_2".usos (nome) ON UPDATE CASCADE ON DELETE RESTRICT,
+	CONSTRAINT unidadesdegestao_linhas_prop_uso_fkey FOREIGN KEY (prop_uso) REFERENCES "PGHP_2".usos (nome) ON UPDATE CASCADE ON DELETE RESTRICT
 )
 	INHERITS ("PGHP_2".unidadesdegestao);
 
@@ -82,6 +78,10 @@ CREATE INDEX unidadesdegestao_linhas_idx
   ON "PGHP_2".unidadesdegestao_linhas
   USING gist
   (geom);
+
+-- Criar versioning --
+
+SELECT vsr_add_versioning_to('"PGHP_2".unidadesdegestao_linhas');
 
 -- Tabela das unidades de gestao para geometrias de polígonos (child)
 CREATE TABLE "PGHP_2".unidadesdegestao_poligonos
@@ -92,8 +92,8 @@ CREATE TABLE "PGHP_2".unidadesdegestao_poligonos
 	CONSTRAINT unidadesdegestao_poligonos_pk PRIMARY KEY (gid),
 	CONSTRAINT unidadesdegestao_poligonos_oid_key UNIQUE (oid),
 	CONSTRAINT unidadesdegestao_unidadesterritoriais_fkey FOREIGN KEY (uniterr_oid) REFERENCES "PGHP_2".unidadesterritoriais(oid) ON UPDATE CASCADE ON DELETE RESTRICT,
-	CONSTRAINT unidadesdegestao_linhas_act_uso_fkey FOREIGN KEY (nome) REFERENCES "PGHP_2".usos (nome) ON UPDATE CASCADE ON DELETE RESTRICT,
-	CONSTRAINT unidadesdegestao_linhas_prop_uso_fkey FOREIGN KEY (nome) REFERENCES "PGHP_2".usos (nome) ON UPDATE CASCADE ON DELETE RESTRICT
+	CONSTRAINT unidadesdegestao_linhas_act_uso_fkey FOREIGN KEY (act_uso) REFERENCES "PGHP_2".usos (nome) ON UPDATE CASCADE ON DELETE RESTRICT,
+	CONSTRAINT unidadesdegestao_linhas_prop_uso_fkey FOREIGN KEY (prop_uso) REFERENCES "PGHP_2".usos (nome) ON UPDATE CASCADE ON DELETE RESTRICT
 )
 	INHERITS ("PGHP_2".unidadesdegestao);
 
@@ -102,3 +102,7 @@ CREATE INDEX unidadesdegestao_poligonos_idx
   ON "PGHP_2".unidadesdegestao_poligonos
   USING gist
   (geom);
+
+-- Criar versioning --
+
+SELECT vsr_add_versioning_to('"PGHP_2".unidadesdegestao_poligonos');
