@@ -11,7 +11,6 @@
 /** Unidades territoriais representam as macro unidades que devem ser geridas como um todo
     Exemplo disso são Quinta do Pisão, Pedra amarela Campo base, Duna da Cresmina, etc... **/
 
-
 CREATE TABLE "PGHP_2".unidadesterritoriais
 (
   gid serial PRIMARY KEY,
@@ -108,3 +107,31 @@ CREATE INDEX unidadesdegestao_poligonos_idx
 -- Criar versioning --
 
 SELECT vsr_add_versioning_to('"PGHP_2".unidadesdegestao_poligonos');
+
+-- Workaround to assign default sequential value to an empty oid field instead of Zero
+-- Useful when the feature geometry is split and you want to keep one of the oid to one part and default values to the others
+
+-- Function to replace oid zero values
+CREATE OR REPLACE FUNCTION "PGHP_2".update_oid()
+RETURNS trigger AS
+$$
+BEGIN
+	IF NEW.oid = 0 THEN
+		NEW.oid = nextval('"PGHP_2".unidadesdegestao_oid_seq'::regclass);
+	END IF;
+	RETURN NEW;
+END;
+$$
+LANGUAGE 'plpgsql';
+
+-- Trigger Function to replace oid zero values
+CREATE TRIGGER update_oid_trg
+  BEFORE INSERT OR UPDATE OF oid ON "PGHP_2".unidadesdegestao_linhas
+  FOR EACH ROW
+  EXECUTE PROCEDURE "PGHP_2".update_oid();
+
+CREATE TRIGGER update_oid_trg
+  BEFORE INSERT OR UPDATE OF oid ON "PGHP_2".unidadesdegestao_poligonos
+  FOR EACH ROW
+  EXECUTE PROCEDURE "PGHP_2".update_oid();
+
