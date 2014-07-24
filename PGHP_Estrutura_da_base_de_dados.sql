@@ -58,7 +58,8 @@ CREATE TABLE "PGHP".unidadesdegestao
   prop_uso character varying(30) REFERENCES "PGHP".usos(nome) ON UPDATE CASCADE ON DELETE RESTRICT,
   prop_composicao character varying(50),
   prop_data_limite timestamp without time zone,
-  geom geometry(geometry, 3763)
+  geom geometry(geometry, 3763),
+  obs character varying
 );
 
 CREATE INDEX unidadesdegestao_idx
