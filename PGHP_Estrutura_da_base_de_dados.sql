@@ -194,7 +194,6 @@ CREATE OR REPLACE RULE "_UPDATE" AS ON UPDATE TO "PGHP".acoes_detalhe_linhas DO 
     SET "geom" = NEW."geom" 
     WHERE gid = OLD."gid";
 
-
 -- tabela das accoes
 CREATE TABLE "PGHP".acoes(
   gid SERIAL PRIMARY KEY,
@@ -215,19 +214,6 @@ CREATE TABLE "PGHP".acoes(
 
 SELECT vsr_add_versioning_to('"PGHP".acoes');
 
--- View para espacializar as acções
-CREATE OR REPLACE VIEW "PGHP".geo_acoes AS 
- SELECT a.gid, a.data_prev_inicio, a.data_prev_fim, a.uniges_oid, a.tipo, a.descricao, 
-    a.entidade, a.responsavel, a.custo, a.areas_detalhe_gid, a.data_exec_inicio, a.data_exec_fim,
-        CASE
-            WHEN a.areas_detalhe_gid IS NULL THEN u.geom
-            ELSE d.geom
-        END AS geom
-   FROM "PGHP".acoes a
-   LEFT JOIN "PGHP".acoes_detalhe d ON a.areas_detalhe_gid = d.gid
-   LEFT JOIN "PGHP".unidadesdegestao u ON a.uniges_oid = u.oid;
-
--- ::FIXME 
 -- View para espacializar as acções em polígonos
 CREATE OR REPLACE VIEW "PGHP".geo_acoes_poligonos AS 
 SELECT
@@ -251,6 +237,7 @@ FROM "PGHP".acoes a
 INNER JOIN "PGHP".unidadesdegestao_poligonos u ON a.uniges_oid = u.oid
 LEFT JOIN "PGHP".acoes_detalhe d ON a.areas_detalhe_gid = d.gid
 
+-- View para espacializar as acções em linhas
 CREATE OR REPLACE VIEW "PGHP".geo_acoes_linhas AS 
 SELECT
 	a.gid,
@@ -272,26 +259,6 @@ SELECT
 FROM "PGHP".acoes a
 INNER JOIN "PGHP".unidadesdegestao_linhas u ON a.uniges_oid = u.oid
 LEFT JOIN "PGHP".acoes_detalhe_linhas d ON a.areas_detalhe_gid = d.gid
-
--- ::FIXME 
-CREATE OR REPLACE VIEW "PGHP".geo_acoes_linhas AS 
-SELECT a.gid, a.data_prev_inicio, a.data_prev_fim, a.uniges_oid, a.tipo, a.descricao, 
-    a.entidade, a.responsavel, a.custo, a.areas_detalhe_gid, a.data_exec_inicio, a.data_exec_fim,
-        (CASE
-            WHEN a.areas_detalhe_gid IS NULL THEN u.geom
-            ELSE d.geom
-        END)::Geometry(Multipolygon,3763) AS geom
-   FROM "PGHP".acoes a
-   LEFT JOIN "PGHP".acoes_detalhe d ON a.areas_detalhe_gid = d.gid
-   LEFT JOIN "PGHP".unidadesdegestao u ON a.uniges_oid = u.oid
-   WHERE
-	St_GeometryType(CASE
-            WHEN a.areas_detalhe_gid IS NULL THEN u.geom
-            ELSE d.geom
-        END) = 'ST_MultiLineString'
-
--- ::FIXME 
-
 
 -- Siglas para composição
 CREATE TABLE "PGHP".uso_siglas (
