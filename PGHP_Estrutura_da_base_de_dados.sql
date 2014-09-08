@@ -152,15 +152,48 @@ CREATE TABLE "PGHP".acao_tipo (
   nome character varying(40) UNIQUE
 );
 
--- tabela espacial
+-- tabelas espaciais
 CREATE TABLE "PGHP".acoes_detalhe (
   gid SERIAL PRIMARY KEY,
-  geom geometry(MultiPolygon,3763)
+  geom geometry(Geometry,3763)
 );
 
 -- Criar versioning --
-
 SELECT vsr_add_versioning_to('"PGHP".acoes_detalhe');
+
+-- views para separar linhas e polígonos
+CREATE VIEW "PGHP".acoes_detalhe_linhas as
+SELECT a.gid, st_multi(a.geom)::geometry(Multilinestring,3763) as geom
+FROM "PGHP".acoes_detalhe as a
+WHERE GeometryType(a.geom) IN ('LINESTRING','MULTILINESTRING');
+
+CREATE VIEW "PGHP".acoes_detalhe_poligonos as
+SELECT a.gid, st_multi(a.geom)::geometry(MultiPolygon,3763) as geom
+FROM "PGHP".acoes_detalhe as a
+WHERE GeometryType(a.geom) IN ('POLYGON','MULTIPOLYGON');
+
+-- triggers para permitir a edição das views
+
+CREATE OR REPLACE RULE "_DELETE" AS ON DELETE TO "PGHP".acoes_detalhe_poligonos DO INSTEAD
+  DELETE FROM "PGHP".acoes_detalhe WHERE gid = OLD."gid";
+CREATE OR REPLACE RULE "_INSERT" AS ON INSERT TO "PGHP".acoes_detalhe_poligonos DO INSTEAD
+  INSERT INTO "PGHP".acoes_detalhe ("geom")
+    VALUES (NEW."geom");
+CREATE OR REPLACE RULE "_UPDATE" AS ON UPDATE TO "PGHP".acoes_detalhe_poligonos DO INSTEAD
+  UPDATE "PGHP".acoes_detalhe
+    SET "geom" = NEW."geom" 
+    WHERE gid = OLD."gid";
+
+CREATE OR REPLACE RULE "_DELETE" AS ON DELETE TO "PGHP".acoes_detalhe_linhas DO INSTEAD
+  DELETE FROM "PGHP".acoes_detalhe WHERE gid = OLD."gid";
+CREATE OR REPLACE RULE "_INSERT" AS ON INSERT TO "PGHP".acoes_detalhe_linhas DO INSTEAD
+  INSERT INTO "PGHP".acoes_detalhe ("geom")
+    VALUES (NEW."geom");
+CREATE OR REPLACE RULE "_UPDATE" AS ON UPDATE TO "PGHP".acoes_detalhe_linhas DO INSTEAD
+  UPDATE "PGHP".acoes_detalhe
+    SET "geom" = NEW."geom" 
+    WHERE gid = OLD."gid";
+
 
 -- tabela das accoes
 CREATE TABLE "PGHP".acoes(
@@ -193,6 +226,69 @@ CREATE OR REPLACE VIEW "PGHP".geo_acoes AS
    FROM "PGHP".acoes a
    LEFT JOIN "PGHP".acoes_detalhe d ON a.areas_detalhe_gid = d.gid
    LEFT JOIN "PGHP".unidadesdegestao u ON a.uniges_oid = u.oid;
+
+-- ::FIXME 
+-- View para espacializar as acções em polígonos
+CREATE OR REPLACE VIEW "PGHP".geo_acoes_poligonos AS 
+SELECT
+	a.gid,
+	a.data_prev_inicio,
+	a.data_prev_fim,
+	a.uniges_oid,
+	a.tipo,
+	a.descricao,
+	a.entidade,
+	a.responsavel,
+	a.custo,
+	a.areas_detalhe_gid,
+	a.data_exec_inicio,
+	a.data_exec_fim,
+        (CASE
+            WHEN a.areas_detalhe_gid IS NULL THEN u.geom
+            ELSE d.geom
+        END)::Geometry(Multipolygon,3763) AS geom
+FROM "PGHP".acoes a
+INNER JOIN "PGHP".unidadesdegestao_poligonos u ON a.uniges_oid = u.oid
+LEFT JOIN "PGHP".acoes_detalhe d ON a.areas_detalhe_gid = d.gid
+
+CREATE OR REPLACE VIEW "PGHP".geo_acoes_linhas AS 
+SELECT
+	a.gid,
+	a.data_prev_inicio,
+	a.data_prev_fim,
+	a.uniges_oid,
+	a.tipo,
+	a.descricao,
+	a.entidade,
+	a.responsavel,
+	a.custo,
+	a.areas_detalhe_gid,
+	a.data_exec_inicio,
+	a.data_exec_fim,
+        (CASE
+            WHEN a.areas_detalhe_gid IS NULL THEN u.geom
+            ELSE d.geom
+        END)::Geometry(multilinestring,3763) AS geom
+FROM "PGHP".acoes a
+INNER JOIN "PGHP".unidadesdegestao_linhas u ON a.uniges_oid = u.oid
+LEFT JOIN "PGHP".acoes_detalhe_linhas d ON a.areas_detalhe_gid = d.gid
+
+-- ::FIXME 
+CREATE OR REPLACE VIEW "PGHP".geo_acoes_linhas AS 
+SELECT a.gid, a.data_prev_inicio, a.data_prev_fim, a.uniges_oid, a.tipo, a.descricao, 
+    a.entidade, a.responsavel, a.custo, a.areas_detalhe_gid, a.data_exec_inicio, a.data_exec_fim,
+        (CASE
+            WHEN a.areas_detalhe_gid IS NULL THEN u.geom
+            ELSE d.geom
+        END)::Geometry(Multipolygon,3763) AS geom
+   FROM "PGHP".acoes a
+   LEFT JOIN "PGHP".acoes_detalhe d ON a.areas_detalhe_gid = d.gid
+   LEFT JOIN "PGHP".unidadesdegestao u ON a.uniges_oid = u.oid
+   WHERE
+	St_GeometryType(CASE
+            WHEN a.areas_detalhe_gid IS NULL THEN u.geom
+            ELSE d.geom
+        END) = 'ST_MultiLineString'
 
 -- ::FIXME 
 
