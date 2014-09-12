@@ -40,6 +40,7 @@ CREATE TABLE "PGHP".infraestruturas
 	tipo character varying(40),
 	nome character varying(40),
 	cadeado boolean,
+	numero_colmeias integer,
 	estado character varying(40) REFERENCES "PGHP".infraestruturas_estado(estado),
 	accao character varying(40) REFERENCES "PGHP".infraestruturas_accoes(accao),
 	observacoes character varying,
@@ -123,6 +124,7 @@ CREATE OR REPLACE VIEW "PGHP"."infraestruturas_current" AS
     "tipo",
     "nome",
     "cadeado",
+    "numero_colmeias"
     "estado",
     "accao",
     "observacoes",
@@ -317,6 +319,36 @@ CREATE OR REPLACE RULE "_UPDATE" AS ON UPDATE TO "PGHP".infra_edificios DO INSTE
   UPDATE "PGHP"."infraestruturas_poligonos"
     SET "oid" = COALESCE(NEW."oid",-1),"uniterr_oid" = NEW."uniterr_oid","classe" = 'Edifícios',"tipo" = NEW."tipo","nome" = NEW."nome","estado" = NEW."estado","accao" = NEW."accao","observacoes" = NEW."observacoes","geom" = NEW."geom" 
     WHERE gid = OLD."gid";
+
+-- apiarios
+CREATE OR REPLACE VIEW "PGHP".infra_apiarios AS 
+ SELECT gid, oid, uniterr_oid, tipo, nome as nome_apicultor, numero_colmeias, estado, accao,
+    observacoes, geom::geometry(Point,3763) AS geom, time_start, time_end, user_update
+   FROM "PGHP".infraestruturas_pontos
+  WHERE infraestruturas_pontos.classe::text = 'Apiários'::text AND infraestruturas_pontos.time_end IS NULL;
+
+--CRIAR TRIGGERS E RULES para tornar a VIEW "Editável"
+CREATE OR REPLACE RULE "_DELETE" AS
+    ON DELETE TO "PGHP".infra_apiarios DO INSTEAD  DELETE FROM "PGHP".infraestruturas_pontos
+  WHERE infraestruturas_pontos.gid = old.gid;
+
+CREATE OR REPLACE RULE "_INSERT" AS
+    ON INSERT TO "PGHP".infra_apiarios DO INSTEAD  INSERT INTO "PGHP".infraestruturas_pontos (oid, uniterr_oid, classe, tipo, nome, numero_colmeias, estado, accao, observacoes, geom) 
+  VALUES (new.oid, new.uniterr_oid, 'Apiários'::character varying, new.tipo, new.nome_apicultor, new.numero_colmeias, new.estado, new.accao, new.observacoes, new.geom);
+
+CREATE OR REPLACE RULE "_UPDATE" AS
+    ON UPDATE TO "PGHP".infra_apiarios DO INSTEAD  UPDATE "PGHP".infraestruturas_pontos SET
+    oid = COALESCE(new.oid, (-1)), uniterr_oid = new.uniterr_oid, classe = 'Apiários'::character varying, tipo = new.tipo, nome = new.nome_apicultor, numero_colmeias = new.numero_colmeias, estado = new.estado, accao = new.accao, observacoes = new.observacoes, geom = new.geom
+  WHERE infraestruturas_pontos.gid = old.gid;
+
+-- view com áreas de protecção dos apiários consoante o número de colmeias implantadas
+CREATE OR REPLACE VIEW "PGHP".infra_apiarios_area_proteccao AS 
+SELECT f.gid, f.estado, 
+            (st_buffer(f.geom, CASE WHEN f.numero_colmeias <= 10 THEN 100
+				   WHEN f.numero_colmeias <= 30 THEN 400
+				   ELSE 800 END
+				))::Geometry('POLYGON',3763) AS geom
+FROM "PGHP".infra_apiarios as f
 
 -- View com todos os pontos a necessitar de reparação
 CREATE OR REPLACE VIEW "PGHP".infraestruturas_alertas AS
